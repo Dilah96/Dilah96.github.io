@@ -13092,7 +13092,7 @@ Nel caso in esame viene presentato l'esempio di $\textbf{Acetaldeide}$ alla temp
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[97]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-matlab"><pre><span></span><span class="n">MW</span> <span class="p">=</span> <span class="mf">44.05256</span><span class="p">;</span>                              <span class="c">%Peso molecolare del composto [g/mol]</span>
@@ -13133,7 +13133,7 @@ $$\rho = \frac{C_1}{C_2^{\left[1+(1-\frac{T}{C_3})^{C_4}\right]}}$$</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[98]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-matlab"><pre><span></span><span class="c">%Costanti specifiche del fluido</span>
@@ -13189,7 +13189,7 @@ $$\mu = e^{\left(C_1 +\frac{C_2}{T} + C_3 \ln T + C_4 T^{C_5} \right)}$$</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[99]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-matlab"><pre><span></span><span class="c">%Costanti specifiche del fluido</span>
@@ -13240,7 +13240,7 @@ $$C_{P,liq}=C_1 + C_2 T + C_3 T^2 + C_4 T^3 +C_5 T^4 $$</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[100]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-matlab"><pre><span></span><span class="c">%Costanti specifiche del fluido</span>
@@ -13294,7 +13294,7 @@ $$K = C_1 + C_2 T + C_3 T^2 + C_4 T^3 +C_5 T^4 $$</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[101]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-matlab"><pre><span></span><span class="c">%Costanti specifiche del fluido</span>
@@ -13308,7 +13308,7 @@ $$K = C_1 + C_2 T + C_3 T^2 + C_4 T^3 +C_5 T^4 $$</p>
 <span class="n">k</span> <span class="p">=</span> <span class="n">C1</span> <span class="o">+</span> <span class="n">C2</span><span class="o">*</span><span class="n">T</span> <span class="o">+</span> <span class="n">C3</span><span class="o">*</span><span class="n">T</span>^<span class="mi">2</span> <span class="o">+</span> <span class="n">C4</span><span class="o">*</span><span class="n">T</span>^<span class="mi">3</span> <span class="o">+</span> <span class="n">C5</span><span class="o">*</span><span class="n">T</span>^<span class="mi">4</span><span class="p">;</span>
 
 <span class="c">%Stampa valori della conducibilità termica</span>
-<span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Il valore della densità è di: %3.7f [W/(m*K)]&#39;</span><span class="p">,</span><span class="n">cp</span><span class="p">)</span>
+<span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Il valore della conducibilità termica è di: %3.7f [W/(m*K)]&#39;</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13325,7 +13325,7 @@ $$K = C_1 + C_2 T + C_3 T^2 + C_4 T^3 +C_5 T^4 $$</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Il valore della densità è di: 2271.4404112 [W/(m*K)]
+<pre>Il valore della conducibilità termica è di: 0.1418555 [W/(m*K)]
 </pre>
 </div>
 </div>
@@ -13352,7 +13352,7 @@ $$\ln P = C_1 + \frac{C_2}{T} +C_3 \ln T + C_4 T^{C_5}$$</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[103]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-matlab"><pre><span></span><span class="c">%Costanti specifiche del fluido</span>
