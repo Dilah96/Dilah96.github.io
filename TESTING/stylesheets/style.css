@@ -1,0 +1,48 @@
+<style>
+.articles-carousel {
+  text-align: center;
+  margin: 3rem auto;
+  max-width: 800px;
+  font-family: "Roboto", sans-serif;
+}
+
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.card {
+  min-width: 100%;
+  box-sizing: border-box;
+  padding: 2rem;
+  background: #f9f9f9;
+  margin: 0 5px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+button.prev,
+button.next {
+  position: absolute;
+  top: 10px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #333;
+  padding: 0 10px;
+  z-index: 10;
+}
+
+button.prev { left: 0; }
+button.next { right: 0; }
+
+button:hover {
+  color: #0073e6;
+}
+</style>
