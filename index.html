@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --bg-dark:#12181f;
@@ -437,7 +437,7 @@
     <img class="avatar" src="foto.JPG" alt="Alberto Biasi" onerror="this.style.display='none'">
     <div class="hero-text">
       <h1>Database Alimenti</h1>
-      <p>269 alimenti comuni · valori nutrizionali per 100&nbsp;g · ricerca e calcolo pasto</p>
+      <p>Valori nutrizionali per 100&nbsp;g · ricerca e calcolo</p>
       <a class="backlink" href="index.html">← Torna alla home</a>
     </div>
   </div>
@@ -448,7 +448,6 @@
     Piccolo strumento nato insieme al foglio Excel per il calcolo delle calorie giornaliere:
     <strong>cerca un alimento</strong>, controlla i suoi valori per 100&nbsp;g, e se vuoi
     <strong>aggiungilo al tuo pasto</strong> per vedere il totale calorico in tempo reale (in basso a destra).
-    I dati arrivano dal file <code>alimenti.csv</code>: aggiornalo e la pagina si aggiorna da sola.
   </p>
 
   <div id="statusBanner" style="display:none; padding:12px 16px; border-radius:10px; font-size:0.85rem; margin-bottom:18px;"></div>
@@ -571,29 +570,31 @@ function showBanner(msg, kind){
 
 function hideBanner(){ statusBanner.style.display = 'none'; }
 
-// converte "1,5" -> 1.5 ; stringa vuota -> 0
+// converte celle vuote/undefined -> 0, altrimenti numero
 function parseNum(v){
-  if(v === undefined || v === null || v.trim() === '') return 0;
-  return parseFloat(v.replace(',', '.')) || 0;
+  if(v === undefined || v === null || v === '') return 0;
+  const n = typeof v === 'number' ? v : parseFloat(String(v).replace(',', '.'));
+  return isNaN(n) ? 0 : n;
 }
 
 function loadFoods(){
-  showBanner('Caricamento di alimenti.csv…', 'ok');
-  Papa.parse('alimenti.csv', {
-    download: true,
-    header: true,
-    delimiter: ';',
-    skipEmptyLines: true,
-    complete: function(results){
-      if(!results.data || results.data.length === 0){
-        showBanner('Il file alimenti.csv è vuoto o non è stato trovato.', 'error');
-        return;
-      }
-      FOODS = results.data
-        .filter(r => r['Cibo'] && r['Cibo'].trim() !== '')
+  showBanner('Caricamento di alimenti.xlsx…', 'ok');
+  fetch('alimenti.xlsx')
+    .then(res => {
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      return res.arrayBuffer();
+    })
+    .then(buf => {
+      const wb = XLSX.read(buf, { type: 'array' });
+      const sheet = wb.Sheets['Alimenti'] || wb.Sheets[wb.SheetNames[0]];
+      // defval:'' evita che le celle vuote (Prezzo/Data/Note) rompano il parsing
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+      FOODS = rows
+        .filter(r => r['Cibo'] && String(r['Cibo']).trim() !== '' && String(r['Categoria'] || '').trim() !== '')
         .map(r => ({
-          n: r['Cibo'].trim(),
-          c: (r['Categoria'] || 'Altro').trim(),
+          n: String(r['Cibo']).trim(),
+          c: String(r['Categoria'] || 'Altro').trim(),
           k: parseNum(r['Energia[kcal]']),
           g: parseNum(r['Grassi [g]']),
           s: parseNum(r['Saturi [g]']),
@@ -603,13 +604,17 @@ function loadFoods(){
           p: parseNum(r['Proteine [g]']),
           sa: parseNum(r['Sale [g]'])
         }));
+
+      if(FOODS.length === 0){
+        showBanner('Il file alimenti.xlsx non contiene righe valide nel foglio "Alimenti".', 'error');
+        return;
+      }
       hideBanner();
       initUI();
-    },
-    error: function(err){
-      showBanner('Impossibile caricare alimenti.csv (' + err + '). Se hai aperto il file direttamente dal computer, il browser blocca il caricamento locale: avvia un piccolo server (es. "python3 -m http.server" nella cartella) oppure visita la pagina pubblicata su GitHub Pages.', 'error');
-    }
-  });
+    })
+    .catch(err => {
+      showBanner('Impossibile caricare alimenti.xlsx (' + err.message + '). Se hai aperto il file direttamente dal computer, il browser blocca il caricamento locale: avvia un piccolo server (es. "python3 -m http.server" nella cartella) oppure visita la pagina pubblicata su GitHub Pages.', 'error');
+    });
 }
 
 function initUI(){
