@@ -1,14 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<title>Alberto Biasi — Portfolio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Database Alimenti — Alberto Biasi</title>
-<meta name="description" content="Database nutrizionale di 269 alimenti comuni con motore di ricerca e calcolatore di pasto.">
+<meta name="description" content="Portfolio di Alberto Biasi, ingegnere chimico e dei materiali — progetti, tesi e strumenti personali.">
+<link rel="icon" type="image/x-icon" href="./construction_engineering_helmet_cog_icon_153230.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --bg-dark:#12181f;
@@ -21,12 +22,7 @@
     --accent:#1f9d6b;
     --accent-dark:#157a54;
     --amber:#c8862c;
-    --grain:#b8813a;
-    --veg:#1f9d6b;
     --protein:#bd4a3f;
-    --dairy:#c99a2a;
-    --treat:#7d5aad;
-    --other:#697079;
     --radius:10px;
     --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     --disp: 'Space Grotesk', ui-sans-serif, sans-serif;
@@ -43,711 +39,545 @@
     -webkit-font-smoothing:antialiased;
   }
   a{color:var(--accent-dark);}
+  h1,h2,h3{ font-family:var(--disp); letter-spacing:-0.01em; }
 
-  /* ---------- HEADER ---------- */
+  /* ---------- TOP NAV ---------- */
+  .topnav{
+    position:sticky; top:0; z-index:30;
+    background:rgba(18,24,31,.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .topnav-inner{
+    max-width:1040px; margin:0 auto;
+    padding:12px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    color:#eef1ee; text-decoration:none;
+    font-family:var(--disp); font-weight:600; font-size:0.95rem;
+  }
+  .brand img{ width:28px; height:28px; border-radius:50%; object-fit:cover; }
+  .navlinks{
+    display:flex; align-items:center; gap:6px;
+    flex-wrap:wrap;
+  }
+  .navlinks a{
+    color:#c7cdc8; text-decoration:none;
+    font-size:0.86rem;
+    padding:7px 12px;
+    border-radius:8px;
+    transition:.15s ease;
+  }
+  .navlinks a:hover{ background:rgba(255,255,255,.08); color:#fff; }
+  .navlinks a.cta{
+    background:var(--accent);
+    color:#fff;
+    font-weight:600;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .navlinks a.cta:hover{ background:var(--accent-dark); }
+
+  /* ---------- HERO ---------- */
   header.hero{
     background:
       radial-gradient(900px 420px at 12% -10%, #223027 0%, transparent 60%),
       linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-dark-2) 100%);
     color:#eef1ee;
-    padding:44px 24px 40px;
+    padding:48px 24px 44px;
   }
   .hero-inner{
-    max-width:980px;
-    margin:0 auto;
-    display:flex;
-    align-items:center;
-    gap:22px;
-    flex-wrap:wrap;
+    max-width:1040px; margin:0 auto;
+    display:flex; align-items:center; gap:26px; flex-wrap:wrap;
   }
-  .avatar{
-    width:64px;height:64px;border-radius:50%;
+  .avatar-lg{
+    width:104px; height:104px; border-radius:50%;
     object-fit:cover;
-    border:2px solid rgba(255,255,255,.18);
+    border:3px solid rgba(255,255,255,.18);
     flex-shrink:0;
   }
-  .hero-text h1{
-    font-family:var(--disp);
-    font-weight:700;
-    font-size:clamp(1.5rem, 3vw, 2.1rem);
-    margin:0 0 4px;
-    letter-spacing:-0.01em;
-  }
-  .hero-text p{
-    margin:0;
+  .hero-text h1{ font-size:clamp(1.7rem,3.4vw,2.3rem); margin:0 0 6px; }
+  .hero-text .role{ margin:0; color:#cfd6d0; font-size:0.98rem; }
+  .hero-text .role.sub{ color:#9aa39c; font-size:0.9rem; margin-top:2px; }
+  blockquote{
+    margin:14px 0 0; padding:10px 14px;
+    border-left:2px solid var(--accent);
     color:#aab3ac;
-    font-size:0.98rem;
+    font-style:italic;
+    font-size:0.9rem;
   }
-  .backlink{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    margin-top:14px;
-    font-size:0.85rem;
-    color:#cfd6d0;
-    text-decoration:none;
+  blockquote p{ margin:0; }
+  .social{ list-style:none; padding:0; margin:16px 0 0; display:flex; gap:10px; flex-wrap:wrap; }
+  .social li a{
+    display:inline-flex; align-items:center; gap:7px;
+    color:#cfd6d0; text-decoration:none;
     border:1px solid rgba(255,255,255,.18);
-    padding:6px 12px;
-    border-radius:999px;
+    padding:7px 13px; border-radius:999px;
+    font-size:0.83rem;
     transition:.15s ease;
   }
-  .backlink:hover{ background:rgba(255,255,255,.08); color:#fff; }
+  .social li a:hover{ background:rgba(255,255,255,.08); color:#fff; }
+  .social svg{ width:15px; height:15px; }
 
-  /* ---------- MAIN ---------- */
-  main{max-width:980px; margin:0 auto; padding:34px 24px 90px;}
+  /* ---------- MAIN LAYOUT ---------- */
+  main{ max-width:1040px; margin:0 auto; padding:0 24px; }
+  section{ padding:46px 0; border-bottom:1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+  section > h2{ font-size:1.35rem; margin:0 0 6px; }
+  section > p.sub{ color:var(--muted); font-size:0.92rem; margin:0 0 24px; max-width:640px; }
 
-  .intro{
-    max-width:640px;
-    color:var(--muted);
-    font-size:0.98rem;
-    margin-bottom:28px;
-  }
-  .intro strong{color:var(--ink);}
+  .bio{ max-width:680px; color:var(--muted); font-size:0.98rem; }
+  .bio strong{ color:var(--ink); }
 
-  .toolbar{
-    position:sticky;
-    top:0;
-    z-index:5;
-    background:var(--bg-light);
-    padding:14px 0 12px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    border-bottom:1px solid var(--line);
-    margin-bottom:6px;
-  }
-  .search-wrap{
-    position:relative;
-    flex:1 1 260px;
-  }
-  .search-wrap svg{
-    position:absolute; left:12px; top:50%; transform:translateY(-50%);
-    width:16px;height:16px; color:var(--muted);
-  }
-  #search{
-    width:100%;
-    padding:11px 14px 11px 36px;
-    border-radius:var(--radius);
+  .cv-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    margin-top:16px;
+    background:var(--card); color:var(--ink);
     border:1px solid var(--line);
-    background:var(--card);
-    font-family:var(--body);
-    font-size:0.95rem;
-    color:var(--ink);
-    outline:none;
-    transition:.15s ease;
-  }
-  #search:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(31,157,107,.12); }
-  select{
-    padding:11px 14px;
-    border-radius:var(--radius);
-    border:1px solid var(--line);
-    background:var(--card);
-    font-family:var(--body);
-    font-size:0.9rem;
-    color:var(--ink);
-    outline:none;
-  }
-  .count{
-    font-family:var(--mono);
-    font-size:0.78rem;
-    color:var(--muted);
-    padding:8px 2px 14px;
-  }
-
-  /* ---------- TABLE ---------- */
-  .table-wrap{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    overflow:auto;
-    max-height:60vh;
-  }
-  table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:0.86rem;
-    min-width:520px;
-  }
-  thead th{
-    position:sticky; top:0;
-    background:#fafaf9;
-    text-align:right;
-    padding:10px 12px;
-    font-family:var(--disp);
+    padding:9px 16px; border-radius:999px;
+    font-size:0.86rem; text-decoration:none;
     font-weight:600;
-    font-size:0.72rem;
-    letter-spacing:.04em;
-    text-transform:uppercase;
-    color:var(--muted);
-    border-bottom:1px solid var(--line);
-    white-space:nowrap;
+    transition:.15s ease;
   }
-  thead th:first-child, thead th:nth-child(2), thead th:nth-child(4){ text-align:left; }
-  tbody td{
-    padding:9px 12px;
-    border-bottom:1px solid #eef0ee;
-    font-family:var(--mono);
-    text-align:right;
-    white-space:nowrap;
-    color:var(--ink);
-  }
-  tbody td:first-child{
-    font-family:var(--body);
-    text-align:left;
-    white-space:normal;
-    min-width:200px;
-    font-weight:500;
-  }
-  tbody td:nth-child(2){ text-align:left; }
-  tbody td:nth-child(4){ text-align:left; }
-  .note-cell{
-    text-align:left;
-    font-family:var(--body);
-    color:var(--muted);
-    white-space:normal;
-    max-width:220px;
-    font-size:0.82rem;
-  }
-  tbody tr:hover{ background:#f7faf8; }
-  .tag{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    font-family:var(--body);
-    font-size:0.72rem;
-    color:var(--muted);
-  }
-  .dot{ width:8px;height:8px;border-radius:50%; flex-shrink:0; }
-  .addbtn{
-    font-family:var(--mono);
-    font-size:0.72rem;
-    border:1px solid var(--line);
-    background:#fff;
-    color:var(--accent-dark);
-    border-radius:6px;
-    padding:4px 8px;
-    cursor:pointer;
-    transition:.12s ease;
-  }
-  .addbtn:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
-  .qty-input{
-    width:52px;
-    font-family:var(--mono);
-    font-size:0.78rem;
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:4px 5px;
-    text-align:right;
-    margin-right:6px;
-  }
-  .empty-row td{
-    text-align:center;
-    color:var(--muted);
-    font-family:var(--body);
-    padding:34px 12px;
-  }
+  .cv-btn:hover{ border-color:var(--accent); color:var(--accent-dark); }
 
-  .legend{
-    display:flex;
-    flex-wrap:wrap;
-    gap:14px;
-    margin:14px 2px 0;
-    font-size:0.74rem;
-    color:var(--muted);
-    font-family:var(--body);
+  /* ---------- PROJECT CAROUSEL (nuovo, centrale) ---------- */
+  .proj-carousel-wrap{ position:relative; }
+  .proj-carousel{
+    display:flex; gap:16px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding:6px 2px 18px;
+    scrollbar-width:thin;
   }
-  .legend span{display:inline-flex; align-items:center; gap:6px;}
-
-  /* ---------- METHOD ---------- */
-  .method{
-    margin-top:56px;
-  }
-  .method h2, .table-section h2{
-    font-family:var(--disp);
-    font-size:1.3rem;
-    margin:0 0 6px;
-  }
-  .method .sub, .table-section .sub{
-    color:var(--muted);
-    font-size:0.9rem;
-    margin:0 0 20px;
-  }
-  .steps{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:14px;
-  }
-  @media (max-width:720px){ .steps{ grid-template-columns:1fr; } }
-  .step{
+  .proj-carousel::-webkit-scrollbar{ height:6px; }
+  .proj-carousel::-webkit-scrollbar-thumb{ background:var(--line); border-radius:6px; }
+  .proj-card{
+    scroll-snap-align:start;
+    flex:0 0 clamp(260px, 78vw, 320px);
     background:var(--card);
     border:1px solid var(--line);
     border-radius:var(--radius);
-    padding:16px 16px 18px;
+    padding:20px 20px 18px;
+    display:flex; flex-direction:column;
   }
-  .step .n{
-    font-family:var(--mono);
-    color:var(--accent-dark);
-    font-size:0.75rem;
-    margin-bottom:8px;
+  .proj-status{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--mono); font-size:0.68rem;
+    letter-spacing:.03em; text-transform:uppercase;
+    padding:3px 9px; border-radius:999px;
+    width:fit-content; margin-bottom:12px;
   }
-  .step h3{
-    font-family:var(--disp);
-    font-size:0.98rem;
-    margin:0 0 6px;
-  }
-  .step p{
-    margin:0;
+  .proj-status.done{ background:#e7f5ee; color:var(--accent-dark); }
+  .proj-status.wip{ background:#fbf1e3; color:var(--amber); }
+  .proj-card h3{ font-size:1.02rem; margin:0 0 10px; }
+  .proj-card ul{ list-style:none; margin:0; padding:0; flex:1; }
+  .proj-card li{
     font-size:0.85rem;
+    padding:6px 0;
+    border-top:1px dotted #ececea;
     color:var(--muted);
   }
+  .proj-card li:first-child{ border-top:none; }
+  .proj-card li a{ color:var(--ink); text-decoration:none; }
+  .proj-card li a:hover{ color:var(--accent-dark); text-decoration:underline; }
+  .proj-nav{
+    position:absolute; top:44%; transform:translateY(-50%);
+    background:var(--card); border:1px solid var(--line);
+    width:36px; height:36px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,.08);
+    font-size:0.9rem; color:var(--ink);
+    z-index:2;
+  }
+  .proj-nav.prev{ left:-14px; }
+  .proj-nav.next{ right:-14px; }
+  .proj-nav:hover{ border-color:var(--accent); color:var(--accent-dark); }
+  @media (max-width:640px){ .proj-nav{ display:none; } }
 
-  /* ---------- TICKET (signature element) ---------- */
-  .ticket-toggle{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    z-index:20;
-    background:var(--bg-dark);
-    color:#fff;
-    border:none;
-    border-radius:999px;
-    padding:12px 18px;
-    font-family:var(--mono);
-    font-size:0.82rem;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    cursor:pointer;
-    box-shadow:0 8px 24px rgba(0,0,0,.25);
+  /* ---------- ARTICOLI carousel (esistente, restilizzato) ---------- */
+  .articles-carousel .carousel-container{
+    position:relative;
+    display:flex; align-items:center; gap:10px;
   }
-  .ticket-toggle .badge{
-    background:var(--accent);
-    color:#fff;
-    border-radius:999px;
-    padding:1px 8px;
-    font-size:0.72rem;
-  }
-  .ticket{
-    position:fixed;
-    right:20px;
-    bottom:82px;
-    width:320px;
-    max-width:calc(100vw - 40px);
-    max-height:60vh;
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:12px;
-    box-shadow:0 16px 40px rgba(0,0,0,.18);
-    z-index:20;
-    display:none;
-    flex-direction:column;
-    overflow:hidden;
-    font-family:var(--mono);
-  }
-  .ticket.open{ display:flex; }
-  .ticket-head{
-    padding:14px 16px 10px;
-    border-bottom:1px dashed var(--line);
-  }
-  .ticket-head .lbl{
-    font-size:0.68rem;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:var(--muted);
-    font-family:var(--body);
-    font-weight:600;
-  }
-  .ticket-head .title{
-    font-family:var(--disp);
-    font-size:1rem;
-    color:var(--ink);
-    margin-top:2px;
-  }
-  .ticket-body{
-    padding:8px 16px;
-    overflow-y:auto;
+  .carousel{
+    display:flex; gap:16px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding:6px 2px 10px;
     flex:1;
   }
-  .ticket-row{
-    display:flex;
-    justify-content:space-between;
-    gap:8px;
-    padding:7px 0;
-    border-bottom:1px dotted #ececea;
-    font-size:0.78rem;
-  }
-  .ticket-row .rname{
-    color:var(--ink);
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-  }
-  .ticket-row .rmeta{ color:var(--muted); font-size:0.72rem; }
-  .ticket-row .rkcal{ color:var(--accent-dark); font-weight:600; white-space:nowrap; }
-  .rm{
-    border:none;background:none;color:#b7bcb8;cursor:pointer;font-size:0.85rem;
-    padding:0 0 0 8px;
-  }
-  .rm:hover{ color:var(--protein); }
-  .ticket-empty{
-    color:var(--muted);
-    font-size:0.78rem;
-    padding:18px 0;
-    text-align:center;
-    font-family:var(--body);
-  }
-  .ticket-foot{
-    border-top:1px dashed var(--line);
-    padding:12px 16px 14px;
-    background:#fafaf9;
-  }
-  .tf-row{
-    display:flex; justify-content:space-between;
-    font-size:0.78rem;
-    padding:2px 0;
-    color:var(--muted);
-  }
-  .tf-row.total{
-    font-size:0.98rem;
-    color:var(--ink);
-    font-weight:600;
-    padding-top:6px;
-  }
-  .tf-row.total .val{ color:var(--accent-dark); }
-  .clear-btn{
-    margin-top:10px;
-    width:100%;
-    background:none;
+  .card{
+    scroll-snap-align:start;
+    flex:0 0 clamp(240px, 70vw, 300px);
+    background:var(--card);
     border:1px solid var(--line);
-    border-radius:8px;
-    padding:7px;
-    font-family:var(--body);
-    font-size:0.78rem;
-    color:var(--muted);
-    cursor:pointer;
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
   }
-  .clear-btn:hover{ border-color:var(--protein); color:var(--protein); }
+  .card h3{ font-size:0.98rem; margin:0 0 8px; }
+  .card p{ font-size:0.85rem; color:var(--muted); margin:0 0 10px; }
+  .card a{ font-size:0.83rem; font-weight:600; text-decoration:none; }
+  .card a:hover{ text-decoration:underline; }
+  .prev, .next{
+    background:var(--card); border:1px solid var(--line);
+    width:34px; height:34px; border-radius:50%;
+    cursor:pointer; flex-shrink:0;
+    color:var(--ink); font-size:0.85rem;
+  }
+  .prev:hover, .next:hover{ border-color:var(--accent); color:var(--accent-dark); }
+
+  /* ---------- DETAILED PROJECT GROUPS ---------- */
+  .detail-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:14px;
+  }
+  @media (max-width:720px){ .detail-grid{ grid-template-columns:1fr; } }
+  .detail-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+  }
+  .detail-card h3{ font-size:0.95rem; margin:0 0 10px; color:var(--ink); }
+  .detail-card ol{ margin:0; padding-left:18px; }
+  .detail-card li{ font-size:0.85rem; margin-bottom:6px; color:var(--muted); }
+  .detail-card li a{ color:var(--ink); text-decoration:none; }
+  .detail-card li a:hover{ color:var(--accent-dark); text-decoration:underline; }
+  .detail-card.empty{ display:none; } /* nasconde le categorie ancora senza contenuti */
+
+  .links-inline{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+  .links-inline a{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--card); border:1px solid var(--line);
+    padding:8px 14px; border-radius:999px;
+    font-size:0.85rem; text-decoration:none; color:var(--ink);
+  }
+  .links-inline a:hover{ border-color:var(--accent); color:var(--accent-dark); }
+
+  /* ---------- PERSONAL PROJECTS GRID ---------- */
+  .personal-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
+    gap:14px;
+  }
+  .personal-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
+    text-decoration:none;
+    color:var(--ink);
+    transition:.15s ease;
+    display:block;
+  }
+  .personal-card:hover{ border-color:var(--accent); transform:translateY(-2px); }
+  .personal-card .pc-title{ font-family:var(--disp); font-weight:600; font-size:0.98rem; margin-bottom:4px; }
+  .personal-card .pc-desc{ font-size:0.82rem; color:var(--muted); }
+  .personal-card.featured{ border-color:var(--accent); background:#f3faf6; }
+  .personal-card.featured .pc-title{ color:var(--accent-dark); }
 
   footer{
-    max-width:980px;
-    margin:0 auto;
+    max-width:1040px; margin:0 auto;
     padding:26px 24px 60px;
-    color:var(--muted);
-    font-size:0.8rem;
-    border-top:1px solid var(--line);
+    color:var(--muted); font-size:0.8rem;
   }
   footer a{ color:var(--muted); }
 </style>
+<script src="javascripts/script.js" defer></script>
 </head>
 <body>
 
-<header class="hero">
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="#top">
+      <img src="./foto.JPG" alt="Alberto Biasi">
+      Alberto Biasi
+    </a>
+    <div class="navlinks">
+      <a href="#progetti">Progetti</a>
+      <a href="#articoli">Articoli</a>
+      <a href="#dettagli">Dettagli</a>
+      <a class="cta" href="alimenti.html">🍽️ Database Alimenti</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
   <div class="hero-inner">
-    <img class="avatar" src="foto.JPG" alt="Alberto Biasi" onerror="this.style.display='none'">
+    <img class="avatar-lg" src="./foto.JPG" alt="Alberto Biasi">
     <div class="hero-text">
-      <h1>Database Alimenti</h1>
-      <p id="heroCount">Caricamento… · valori nutrizionali per 100&nbsp;g · ricerca e calcolo pasto</p>
-      <a class="backlink" href="index.html">← Torna alla home</a>
+      <h1>Alberto Biasi</h1>
+      <p class="role">Ingegnere Chimico e dei Materiali</p>
+      <p class="role sub">Ricerca e Sviluppo nel campo adesivi industriali</p>
+      <blockquote><p>Life is this, I Like This. H.S.</p></blockquote>
+      <ul class="social">
+        <li><a href="https://www.linkedin.com/in/alberto-biasi-190278193/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V23h-4V8zm7.5 0h3.8v2.05h.05c.53-1 1.83-2.05 3.77-2.05C19.9 8 21 10.3 21 13.6V23h-4v-8.4c0-2-.03-4.6-2.8-4.6-2.8 0-3.2 2.2-3.2 4.45V23H7V8z"/></svg>
+          LinkedIn</a></li>
+        <li><a href="https://github.com/Dilah96" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.1.82-.26.82-.58v-2.02c-3.34.73-4.04-1.6-4.04-1.6-.55-1.4-1.34-1.77-1.34-1.77-1.1-.75.08-.74.08-.74 1.2.09 1.84 1.24 1.84 1.24 1.08 1.84 2.83 1.31 3.52 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.53.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.65.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.69.83.58A12 12 0 0 0 12 .3Z"/></svg>
+          GitHub</a></li>
+      </ul>
     </div>
   </div>
 </header>
 
 <main>
-  <p class="intro">
-    La creazione di questo strumento online nasce dalla mia necessità di avere a portata di mano
-    su cellulare anche offline la possibilità di accedere ai dati delle calorie degli alimenti
-    che in precedenza conservavo all'interno di un file excel, sul quale il presente sito è basato.
-  </p>
-  <p class="intro" style="margin-top:-16px; font-size:0.85rem;">
-    I dati arrivano dal file <code>alimenti.xlsx</code>: aggiornalo e la pagina si aggiorna da sola.
-  </p>
 
-  <div id="statusBanner" style="display:none; padding:12px 16px; border-radius:10px; font-size:0.85rem; margin-bottom:18px;"></div>
-
-  <section class="table-section">
-    <div class="toolbar">
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="search" type="text" placeholder="Cerca un alimento… es. pollo, mela, parmigiano" autocomplete="off">
-      </div>
-      <select id="catFilter">
-        <option value="">Tutte le categorie</option>
-      </select>
-    </div>
-    <div class="count" id="count"></div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Cibo</th>
-            <th>Note</th>
-            <th>Energia<br>[kcal]</th>
-            <th>Categoria</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-
-    <div class="legend" id="legend"></div>
+  <section id="portfolio">
+    <h2>Portfolio</h2>
+    <p class="bio">
+      Sono uno studente di ingegneria chimica all'Università di Padova. I miei campi di interesse
+      spaziano dal <strong>design e controllo di processo</strong>, alla <strong>scienza dei materiali</strong>,
+      in particolare nell'ambito dei polimeri. Nel tempo libero mi piace fare sport, giardinaggio
+      e cucinare per amici e famiglia.
+    </p>
+    <a class="cv-btn" href="#">📄 My CV</a>
   </section>
 
-  <section class="method">
-    <h2>Come cercare un alimento</h2>
-    <p class="sub">Il database è integrato direttamente nella pagina: nessun caricamento, nessun account, funziona anche offline dopo il primo accesso.</p>
-    <div class="steps">
-      <div class="step">
-        <div class="n">01</div>
-        <h3>Digita nella barra di ricerca</h3>
-        <p>La tabella si filtra a ogni carattere digitato, cercando nel nome dell'alimento. Es. "riso" mostra tutte le varianti (bianco, integrale…).</p>
+  <section id="progetti">
+    <h2>Progetti — completati e in corso</h2>
+    <p class="sub">Una panoramica rapida su cosa ho concluso e su cosa sto ancora lavorando. Scorri per vedere tutte le categorie.</p>
+    <div class="proj-carousel-wrap">
+      <button class="proj-nav prev" id="projPrev" aria-label="precedente">&#10094;</button>
+      <div class="proj-carousel" id="projTrack">
+
+        <article class="proj-card">
+          <span class="proj-status done">Completato</span>
+          <h3>Trasporto di energia</h3>
+          <ul>
+            <li><a href=".\Notebookfileinhtml\Trasportodicalore\Conduzione monodimensionale allo Stato Stazionario.html">Trasporto per conduzione</a></li>
+            <li><a href=".\Notebookfileinhtml\Trasportodicalore\Trasporto per conduzione.html">Conduzione - Sezione monodimensionale</a></li>
+            <li><a href=".\Notebookfileinhtml\Trasportodicalore\Resistenza termica.html">Resistenza termica - Parete sandwich</a></li>
+          </ul>
+        </article>
+
+        <article class="proj-card">
+          <span class="proj-status done">Completato</span>
+          <h3>Controlli di processo</h3>
+          <ul>
+            <li><a href=".\Notebookfileinhtml\Controllodiprocesso\2.2 - Svuotamento serbatoio.html">Svuotamento serbatoio atmosferico (SS)</a></li>
+            <li><a href=".\Notebookfileinhtml\Controllodiprocesso\2.1 - Simulazione miscelazione in tank.html">Miscelazione (SS)</a></li>
+            <li><a href=".\Notebookfileinhtml\Controllodiprocesso\2.4 - Processo di miscelazione PI-Control CSTR.html">CSTR - P&amp;PI - Miscelazione</a></li>
+            <li><a href=".\Notebookfileinhtml\Controllodiprocesso\CSTR(2.6).html">CSTR Reazione esotermica</a></li>
+          </ul>
+        </article>
+
+        <article class="proj-card">
+          <span class="proj-status wip">In corso</span>
+          <h3>Compounds property calculation</h3>
+          <ul>
+            <li><a href=".\Notebookfileinhtml\Proprietà\Calcolatore proprietà fisiche del fluido.html">Proprietà fisiche del fluido</a></li>
+            <li>Adimensional numbers <em>(in arrivo)</em></li>
+          </ul>
+        </article>
+
+        <article class="proj-card">
+          <span class="proj-status done">Completato</span>
+          <h3>Fluid Dynamics Simulation</h3>
+          <ul>
+            <li><a href=".\Progetti\FDS\Biasi_A_Homework1_2_2039791.pdf">Ansys Fluent — Catalytic converter &amp; Printhead</a></li>
+            <li><a href=".\Progetti\FDS\Biasi_Tamiazzo_ Václav_GP2.pdf">Ansys Fluent — Multiphase stirred tank</a></li>
+          </ul>
+        </article>
+
+        <article class="proj-card">
+          <span class="proj-status done">Completato</span>
+          <h3>Processi Industriali Chimici 2</h3>
+          <ul>
+            <li><a href=".\Progetti\PIC2\PIC2 definitivo - Documenti Google.pdf">Idrogenazione oli e grassi</a></li>
+          </ul>
+        </article>
+
+        <article class="proj-card">
+          <span class="proj-status wip">In corso</span>
+          <h3>Sicurezza industriale</h3>
+          <ul>
+            <li><a href=".\Notebookfileinhtml\Controllodiprocesso\">Idrogenazione oli e grassi</a></li>
+          </ul>
+        </article>
+
+        <article class="proj-card">
+          <span class="proj-status done">Completato</span>
+          <h3>Tesi Triennale</h3>
+          <ul>
+            <li><a href=".\Notebookfileinhtml\Tesi.pdf">Reologia del cioccolato: analisi del comportamento di una sospensione in moto laminare</a></li>
+          </ul>
+        </article>
+
+        <article class="proj-card">
+          <span class="proj-status wip">In corso</span>
+          <h3>In arrivo</h3>
+          <ul>
+            <li>Dimensionamento Pompe</li>
+            <li>Polymer characterization</li>
+          </ul>
+        </article>
+
       </div>
-      <div class="step">
-        <div class="n">02</div>
-        <h3>Filtra per categoria</h3>
-        <p>Usa il menu a tendina per restringere la ricerca a una sola categoria (es. solo "Pesce e frutti di mare").</p>
-      </div>
-      <div class="step">
-        <div class="n">03</div>
-        <h3>Aggiungi al pasto</h3>
-        <p>Imposta i grammi e premi "+" sulla riga: il pannello in basso a destra somma automaticamente calorie e macronutrienti.</p>
-      </div>
+      <button class="proj-nav next" id="projNext" aria-label="successivo">&#10095;</button>
     </div>
   </section>
+
+  <section class="articles-carousel" id="articoli">
+    <h2>Articoli</h2>
+    <p class="sub">Riflessioni e approfondimenti su qualità, processi e argomenti di interesse.</p>
+    <div class="carousel-container">
+      <button class="prev">&#10094;</button>
+      <div class="carousel">
+        <article class="card">
+          <h3>Articolo 1</h3>
+          <p>L'ISO 9001 è la norma internazionale per i sistemi di gestione della qualità, basata sul miglioramento continuo e sull'approccio PDCA.
+          Pone al centro la soddisfazione del cliente, la leadership e il coinvolgimento del personale.
+          Adottarla porta vantaggi concreti come efficienza, reputazione e accesso a nuovi mercati.</p>
+          <a href="./Articolo 16092025.html">Leggi di più →</a>
+        </article>
+        <article class="card">
+          <h3>Articolo 2</h3>
+          <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</p>
+          <a href="#">Leggi di più →</a>
+        </article>
+        <article class="card">
+          <h3>Articolo 3</h3>
+          <p>Descrizione breve dell'articolo 3.</p>
+          <a href="#">Leggi di più →</a>
+        </article>
+      </div>
+      <button class="next">&#10095;</button>
+    </div>
+  </section>
+
+  <section id="dettagli">
+    <h2>Projects — dettaglio completo</h2>
+    <p class="sub">Tutti i notebook e progetti universitari, divisi per area.</p>
+
+    <div class="detail-grid">
+      <div class="detail-card">
+        <h3>Compounds property calculation</h3>
+        <ol>
+          <li><a href=".\Notebookfileinhtml\Proprietà\Calcolatore proprietà fisiche del fluido.html">Proprietà fisiche del fluido</a></li>
+          <li><a href="">Adimensional numbers</a></li>
+        </ol>
+      </div>
+
+      <div class="detail-card">
+        <h3>Trasporto di energia</h3>
+        <ol>
+          <li><a href=".\Notebookfileinhtml\Trasportodicalore\Conduzione monodimensionale allo Stato Stazionario.html">Trasporto per conduzione</a></li>
+          <li><a href=".\Notebookfileinhtml\Trasportodicalore\Trasporto per conduzione.html">Conduzione - Sezione monodimensionale</a></li>
+          <li><a href=".\Notebookfileinhtml\Trasportodicalore\Resistenza termica.html">Resistenza termica - Parete sandwich</a></li>
+        </ol>
+      </div>
+
+      <div class="detail-card empty">
+        <h3>Termodinamica</h3>
+        <ol></ol>
+      </div>
+
+      <div class="detail-card empty">
+        <h3>Reattoristica</h3>
+        <ol></ol>
+      </div>
+
+      <div class="detail-card">
+        <h3>Controlli di processo</h3>
+        <ol>
+          <li><a href=".\Notebookfileinhtml\Controllodiprocesso\2.2 - Svuotamento serbatoio.html">Svuotamento serbatoio atmosferico (SS)</a></li>
+          <li><a href=".\Notebookfileinhtml\Controllodiprocesso\2.1 - Simulazione miscelazione in tank.html">Miscelazione (SS)</a></li>
+          <li><a href=".\Notebookfileinhtml\Controllodiprocesso\2.4 - Processo di miscelazione PI-Control CSTR.html">CSTR - P&amp;PI - Miscelazione</a></li>
+          <li><a href=".\Notebookfileinhtml\Controllodiprocesso\CSTR(2.6).html">CSTR Reazione esotermica</a></li>
+        </ol>
+      </div>
+
+      <div class="detail-card">
+        <h3>Processi Industriali Chimici 2</h3>
+        <ol>
+          <li><a href=".\Progetti\PIC2\PIC2 definitivo - Documenti Google.pdf">Idrogenazione oli e grassi</a></li>
+        </ol>
+      </div>
+
+      <div class="detail-card">
+        <h3>Sicurezza industriale</h3>
+        <ol>
+          <li><a href=".\Notebookfileinhtml\Controllodiprocesso\">Idrogenazione oli e grassi</a></li>
+        </ol>
+      </div>
+
+      <div class="detail-card">
+        <h3>Fluid Dynamics Simulation</h3>
+        <ol>
+          <li><a href=".\Progetti\FDS\Biasi_A_Homework1_2_2039791.pdf">Ansys Fluent - Catalytic converter &amp; Printhead simulations</a></li>
+          <li><a href=".\Progetti\FDS\Biasi_Tamiazzo_ Václav_GP2.pdf">Ansys Fluent - Multiphase stirred tank simulation</a></li>
+        </ol>
+      </div>
+
+      <div class="detail-card">
+        <h3>In arrivo</h3>
+        <ol>
+          <li>Dimensionamento Pompe</li>
+          <li>Polymer characterization</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="links-inline" style="margin-top:24px;">
+      <a href=".\Notebookfileinhtml\Tesi.pdf">📘 Tesi Triennale — Reologia del cioccolato</a>
+      <a href="./Paper interessanti.html">🔗 Interesting papers</a>
+      <a href="./Articolo 16092025.html">🔗 ISO 9001</a>
+    </div>
+  </section>
+
+  <section id="personali">
+    <h2>Progetti personali</h2>
+    <p class="sub">Strumenti e raccolte che uso nella vita di tutti i giorni.</p>
+    <div class="personal-grid">
+      <a class="personal-card featured" href="alimenti.html">
+        <div class="pc-title">🍽️ Database Alimenti</div>
+        <div class="pc-desc">Ricerca alimenti e calcolo calorie giornaliere, aggiornabile da Excel.</div>
+      </a>
+      <a class="personal-card" href="https://docs.google.com/spreadsheets/d/1lDXYxOxs4s8cKptCLxB6HvOgmGbxrQ-bbGVKwQwZNuo/edit?usp=sharing" target="_blank" rel="noopener">
+        <div class="pc-title">🌱 Piante e Ricette</div>
+        <div class="pc-desc">Raccolta personale di piante e ricette di cucina.</div>
+      </a>
+      <a class="personal-card" href="https://docs.google.com/spreadsheets/d/1lDXYxOxs4s8cKptCLxB6HvOgmGbxrQ-bbGVKwQwZNuo/edit?usp=sharing" target="_blank" rel="noopener">
+        <div class="pc-title">⛰️ Montagna</div>
+        <div class="pc-desc">Appunti ed escursioni in montagna.</div>
+      </a>
+      <a class="personal-card" href="https://docs.google.com/spreadsheets/d/1lDXYxOxs4s8cKptCLxB6HvOgmGbxrQ-bbGVKwQwZNuo/edit?usp=sharing" target="_blank" rel="noopener">
+        <div class="pc-title">🥃 Distillazione</div>
+        <div class="pc-desc">Note ed esperimenti di distillazione.</div>
+      </a>
+    </div>
+  </section>
+
 </main>
 
-<button class="ticket-toggle" id="ticketToggle">
-  🧾 Il tuo pasto <span class="badge" id="ticketBadge">0</span>
-</button>
-
-<div class="ticket" id="ticket">
-  <div class="ticket-head">
-    <div class="lbl">Riepilogo pasto</div>
-    <div class="title">Composizione live</div>
-  </div>
-  <div class="ticket-body" id="ticketBody">
-    <div class="ticket-empty">Nessun alimento aggiunto.<br>Cerca un cibo e premi "+".</div>
-  </div>
-  <div class="ticket-foot">
-    <div class="tf-row"><span>Grassi</span><span id="tGrassi">0.0 g</span></div>
-    <div class="tf-row"><span>Carboidrati</span><span id="tCarb">0.0 g</span></div>
-    <div class="tf-row"><span>Proteine</span><span id="tProt">0.0 g</span></div>
-    <div class="tf-row total"><span>Totale energia</span><span class="val" id="tKcal">0 kcal</span></div>
-    <button class="clear-btn" id="clearBtn">Svuota il pasto</button>
-  </div>
-</div>
-
 <footer>
-  Parte del portfolio di <a href="index.html">Alberto Biasi</a> — valori nutrizionali medi indicativi
-  (Tabelle CREA/ex-INRAN, USDA FoodData Central). Verifica sempre l'etichetta per prodotti confezionati specifici.
+  <p>This project is maintained by <a href="http://github.com/Dilah96">Alberto Biasi</a></p>
+  <p><small>Hosted on GitHub Pages</small></p>
 </footer>
 
 <script>
-let FOODS = [];
-
-const GROUP = {
-  'Cereali e derivati':'grain', 'Legumi':'grain',
-  'Verdura e ortaggi':'veg', 'Frutta':'veg', 'Frutta secca e semi':'veg',
-  'Carne':'protein', 'Salumi':'protein', 'Pesce e frutti di mare':'protein', 'Uova':'protein',
-  'Latte, yogurt e formaggi':'dairy', 'Grassi e oli':'dairy',
-  'Dolci e snack':'treat', 'Bevande':'treat',
-  'Condimenti e salse':'other', 'Piatti pronti e fast food':'other'
-};
-const GROUP_LABEL = {
-  grain:'Cereali e legumi', veg:'Verdura e frutta', protein:'Carne, pesce e uova',
-  dairy:'Latticini e grassi', treat:'Dolci e bevande', other:'Condimenti e pronti'
-};
-
-const tbody = document.getElementById('tbody');
-const searchInput = document.getElementById('search');
-const catFilter = document.getElementById('catFilter');
-const countEl = document.getElementById('count');
-const legendEl = document.getElementById('legend');
-const statusBanner = document.getElementById('statusBanner');
-
-function showBanner(msg, kind){
-  statusBanner.style.display = 'block';
-  statusBanner.textContent = msg;
-  statusBanner.style.background = kind === 'error' ? '#fbeceb' : '#eef6f0';
-  statusBanner.style.color = kind === 'error' ? '#8a3a33' : '#1f6b46';
-  statusBanner.style.border = '1px solid ' + (kind === 'error' ? '#f0c9c6' : '#c9e6d4');
-}
-
-function hideBanner(){ statusBanner.style.display = 'none'; }
-
-// converte celle vuote/undefined -> 0, altrimenti numero
-function parseNum(v){
-  if(v === undefined || v === null || v === '') return 0;
-  const n = typeof v === 'number' ? v : parseFloat(String(v).replace(',', '.'));
-  return isNaN(n) ? 0 : n;
-}
-
-function loadFoods(){
-  showBanner('Caricamento di alimenti.xlsx…', 'ok');
-  // cache-buster: forza il browser a scaricare sempre l'ultima versione del file,
-  // altrimenti riusa una copia in cache anche dopo che hai aggiornato alimenti.xlsx su GitHub
-  fetch('alimenti.xlsx?v=' + Date.now(), { cache: 'no-store' })
-    .then(res => {
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      return res.arrayBuffer();
-    })
-    .then(buf => {
-      const wb = XLSX.read(buf, { type: 'array' });
-      const sheet = wb.Sheets['Alimenti'] || wb.Sheets[wb.SheetNames[0]];
-      // defval:'' evita che le celle vuote (Prezzo/Data/Note) rompano il parsing
-      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-      FOODS = rows
-        .filter(r => r['Cibo'] && String(r['Cibo']).trim() !== '' && String(r['Categoria'] || '').trim() !== '')
-        .map(r => ({
-          n: String(r['Cibo']).trim(),
-          c: String(r['Categoria'] || 'Altro').trim(),
-          no: String(r['Note'] || '').trim(),
-          k: parseNum(r['Energia[kcal]']),
-          g: parseNum(r['Grassi [g]']),
-          s: parseNum(r['Saturi [g]']),
-          cb: parseNum(r['Carboidrati [g]']),
-          z: parseNum(r['Zuccheri [g]']),
-          f: parseNum(r['Fibre [g]']),
-          p: parseNum(r['Proteine [g]']),
-          sa: parseNum(r['Sale [g]'])
-        }));
-
-      if(FOODS.length === 0){
-        showBanner('Il file alimenti.xlsx non contiene righe valide nel foglio "Alimenti".', 'error');
-        return;
-      }
-      hideBanner();
-      initUI();
-    })
-    .catch(err => {
-      showBanner('Impossibile caricare alimenti.xlsx (' + err.message + '). Se hai aperto il file direttamente dal computer, il browser blocca il caricamento locale: avvia un piccolo server (es. "python3 -m http.server" nella cartella) oppure visita la pagina pubblicata su GitHub Pages.', 'error');
-    });
-}
-
-function initUI(){
-  // conteggio reale delle righe caricate dal file excel, in alto nell'header
-  document.getElementById('heroCount').textContent =
-    FOODS.length + ' alimenti · valori nutrizionali per 100 g · ricerca e calcolo pasto';
-
-  // build category filter options
-  catFilter.innerHTML = '<option value="">Tutte le categorie</option>';
-  [...new Set(FOODS.map(f => f.c))].sort().forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c; opt.textContent = c;
-    catFilter.appendChild(opt);
-  });
-
-  // build legend
-  legendEl.innerHTML = '';
-  Object.keys(GROUP_LABEL).forEach(g => {
-    const s = document.createElement('span');
-    s.innerHTML = `<span class="dot" style="background:var(--${g})"></span>${GROUP_LABEL[g]}`;
-    legendEl.appendChild(s);
-  });
-
-  render();
-}
-
-function fmt(n){ return (Math.round(n*10)/10).toString().replace('.', ','); }
-
-function render(){
-  const q = searchInput.value.trim().toLowerCase();
-  const cat = catFilter.value;
-  const filtered = FOODS.filter(f => {
-    const matchQ = !q || f.n.toLowerCase().includes(q);
-    const matchC = !cat || f.c === cat;
-    return matchQ && matchC;
-  });
-
-  countEl.textContent = filtered.length + ' alimenti su ' + FOODS.length;
-
-  if(filtered.length === 0){
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Nessun alimento trovato. Prova un altro termine di ricerca.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = filtered.map((f, i) => {
-    const g = GROUP[f.c] || 'other';
-    const idx = FOODS.indexOf(f);
-    return `<tr>
-      <td>${f.n}</td>
-      <td class="note-cell">${f.no || ''}</td>
-      <td>${fmt(f.k)}</td>
-      <td><span class="tag"><span class="dot" style="background:var(--${g})"></span>${f.c}</span></td>
-      <td>
-        <input class="qty-input" type="number" min="1" value="100" id="qty-${idx}">
-        <button class="addbtn" onclick="addToMeal(${idx})">+</button>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-searchInput.addEventListener('input', render);
-catFilter.addEventListener('change', render);
-loadFoods();
-
-// ---------------- MEAL TICKET ----------------
-let meal = []; // {idx, qty}
-
-const ticket = document.getElementById('ticket');
-const ticketToggle = document.getElementById('ticketToggle');
-const ticketBody = document.getElementById('ticketBody');
-const ticketBadge = document.getElementById('ticketBadge');
-
-ticketToggle.addEventListener('click', () => {
-  ticket.classList.toggle('open');
-});
-
-document.getElementById('clearBtn').addEventListener('click', () => {
-  meal = [];
-  renderMeal();
-});
-
-function addToMeal(idx){
-  const qtyInput = document.getElementById('qty-' + idx);
-  const qty = Math.max(1, parseFloat(qtyInput.value) || 100);
-  meal.push({ idx, qty });
-  ticket.classList.add('open');
-  renderMeal();
-}
-
-function removeFromMeal(i){
-  meal.splice(i, 1);
-  renderMeal();
-}
-
-function renderMeal(){
-  ticketBadge.textContent = meal.length;
-  if(meal.length === 0){
-    ticketBody.innerHTML = '<div class="ticket-empty">Nessun alimento aggiunto.<br>Cerca un cibo e premi "+".</div>';
-  } else {
-    ticketBody.innerHTML = meal.map((m, i) => {
-      const f = FOODS[m.idx];
-      const factor = m.qty / 100;
-      return `<div class="ticket-row">
-        <div style="min-width:0; flex:1;">
-          <div class="rname">${f.n}</div>
-          <div class="rmeta">${m.qty} g</div>
-        </div>
-        <div class="rkcal">${fmt(f.k*factor)} kcal</div>
-        <button class="rm" onclick="removeFromMeal(${i})">✕</button>
-      </div>`;
-    }).join('');
-  }
-
-  let kcal=0, grassi=0, carb=0, prot=0;
-  meal.forEach(m => {
-    const f = FOODS[m.idx];
-    const factor = m.qty / 100;
-    kcal += f.k*factor; grassi += f.g*factor; carb += f.cb*factor; prot += f.p*factor;
-  });
-  document.getElementById('tKcal').textContent = Math.round(kcal) + ' kcal';
-  document.getElementById('tGrassi').textContent = fmt(grassi) + ' g';
-  document.getElementById('tCarb').textContent = fmt(carb) + ' g';
-  document.getElementById('tProt').textContent = fmt(prot) + ' g';
-}
+  // Carosello progetti: scroll orizzontale con pulsanti prev/next (indipendente da javascripts/script.js)
+  (function(){
+    const track = document.getElementById('projTrack');
+    const prev = document.getElementById('projPrev');
+    const next = document.getElementById('projNext');
+    if(!track) return;
+    function cardStep(){
+      const card = track.querySelector('.proj-card');
+      if(!card) return 300;
+      const style = getComputedStyle(track);
+      const gap = parseFloat(style.gap) || 16;
+      return card.getBoundingClientRect().width + gap;
+    }
+    prev.addEventListener('click', () => track.scrollBy({ left: -cardStep(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: cardStep(), behavior: 'smooth' }));
+  })();
 </script>
 
 </body>

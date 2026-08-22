@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Database Alimenti — Alberto Biasi</title>
+<meta name="description" content="Database nutrizionale di 269 alimenti comuni con motore di ricerca e calcolatore di pasto.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg-dark:#12181f;
+    --bg-dark-2:#1b2229;
+    --bg-light:#f4f5f3;
+    --card:#ffffff;
+    --ink:#14181d;
+    --muted:#5b6470;
+    --line:#e2e5e2;
+    --accent:#1f9d6b;
+    --accent-dark:#157a54;
+    --amber:#c8862c;
+    --grain:#b8813a;
+    --veg:#1f9d6b;
+    --protein:#bd4a3f;
+    --dairy:#c99a2a;
+    --treat:#7d5aad;
+    --other:#697079;
+    --radius:10px;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --disp: 'Space Grotesk', ui-sans-serif, sans-serif;
+    --body: 'Inter', ui-sans-serif, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg-light);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-dark);}
+
+  /* ---------- HEADER ---------- */
+  header.hero{
+    background:
+      radial-gradient(900px 420px at 12% -10%, #223027 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-dark-2) 100%);
+    color:#eef1ee;
+    padding:44px 24px 40px;
+  }
+  .hero-inner{
+    max-width:980px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    gap:22px;
+    flex-wrap:wrap;
+  }
+  .avatar{
+    width:64px;height:64px;border-radius:50%;
+    object-fit:cover;
+    border:2px solid rgba(255,255,255,.18);
+    flex-shrink:0;
+  }
+  .hero-text h1{
+    font-family:var(--disp);
+    font-weight:700;
+    font-size:clamp(1.5rem, 3vw, 2.1rem);
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .hero-text p{
+    margin:0;
+    color:#aab3ac;
+    font-size:0.98rem;
+  }
+  .backlink{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top:14px;
+    font-size:0.85rem;
+    color:#cfd6d0;
+    text-decoration:none;
+    border:1px solid rgba(255,255,255,.18);
+    padding:6px 12px;
+    border-radius:999px;
+    transition:.15s ease;
+  }
+  .backlink:hover{ background:rgba(255,255,255,.08); color:#fff; }
+
+  /* ---------- MAIN ---------- */
+  main{max-width:980px; margin:0 auto; padding:34px 24px 90px;}
+
+  .intro{
+    max-width:640px;
+    color:var(--muted);
+    font-size:0.98rem;
+    margin-bottom:28px;
+  }
+  .intro strong{color:var(--ink);}
+
+  .toolbar{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:var(--bg-light);
+    padding:14px 0 12px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    margin-bottom:6px;
+  }
+  .search-wrap{
+    position:relative;
+    flex:1 1 260px;
+  }
+  .search-wrap svg{
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    width:16px;height:16px; color:var(--muted);
+  }
+  #search{
+    width:100%;
+    padding:11px 14px 11px 36px;
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    background:var(--card);
+    font-family:var(--body);
+    font-size:0.95rem;
+    color:var(--ink);
+    outline:none;
+    transition:.15s ease;
+  }
+  #search:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(31,157,107,.12); }
+  select{
+    padding:11px 14px;
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    background:var(--card);
+    font-family:var(--body);
+    font-size:0.9rem;
+    color:var(--ink);
+    outline:none;
+  }
+  .count{
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--muted);
+    padding:8px 2px 14px;
+  }
+
+  /* ---------- TABLE ---------- */
+  .table-wrap{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:auto;
+    max-height:60vh;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.86rem;
+    min-width:520px;
+  }
+  thead th{
+    position:sticky; top:0;
+    background:#fafaf9;
+    text-align:right;
+    padding:10px 12px;
+    font-family:var(--disp);
+    font-weight:600;
+    font-size:0.72rem;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  thead th:first-child, thead th:nth-child(2), thead th:nth-child(4){ text-align:left; }
+  tbody td{
+    padding:9px 12px;
+    border-bottom:1px solid #eef0ee;
+    font-family:var(--mono);
+    text-align:right;
+    white-space:nowrap;
+    color:var(--ink);
+  }
+  tbody td:first-child{
+    font-family:var(--body);
+    text-align:left;
+    white-space:normal;
+    min-width:200px;
+    font-weight:500;
+  }
+  tbody td:nth-child(2){ text-align:left; }
+  tbody td:nth-child(4){ text-align:left; }
+  .note-cell{
+    text-align:left;
+    font-family:var(--body);
+    color:var(--muted);
+    white-space:normal;
+    max-width:220px;
+    font-size:0.82rem;
+  }
+  tbody tr:hover{ background:#f7faf8; }
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--body);
+    font-size:0.72rem;
+    color:var(--muted);
+  }
+  .dot{ width:8px;height:8px;border-radius:50%; flex-shrink:0; }
+  .addbtn{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--accent-dark);
+    border-radius:6px;
+    padding:4px 8px;
+    cursor:pointer;
+    transition:.12s ease;
+  }
+  .addbtn:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .qty-input{
+    width:52px;
+    font-family:var(--mono);
+    font-size:0.78rem;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:4px 5px;
+    text-align:right;
+    margin-right:6px;
+  }
+  .empty-row td{
+    text-align:center;
+    color:var(--muted);
+    font-family:var(--body);
+    padding:34px 12px;
+  }
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin:14px 2px 0;
+    font-size:0.74rem;
+    color:var(--muted);
+    font-family:var(--body);
+  }
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+
+  /* ---------- METHOD ---------- */
+  .method{
+    margin-top:56px;
+  }
+  .method h2, .table-section h2{
+    font-family:var(--disp);
+    font-size:1.3rem;
+    margin:0 0 6px;
+  }
+  .method .sub, .table-section .sub{
+    color:var(--muted);
+    font-size:0.9rem;
+    margin:0 0 20px;
+  }
+  .steps{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:14px;
+  }
+  @media (max-width:720px){ .steps{ grid-template-columns:1fr; } }
+  .step{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 16px 18px;
+  }
+  .step .n{
+    font-family:var(--mono);
+    color:var(--accent-dark);
+    font-size:0.75rem;
+    margin-bottom:8px;
+  }
+  .step h3{
+    font-family:var(--disp);
+    font-size:0.98rem;
+    margin:0 0 6px;
+  }
+  .step p{
+    margin:0;
+    font-size:0.85rem;
+    color:var(--muted);
+  }
+
+  /* ---------- TICKET (signature element) ---------- */
+  .ticket-toggle{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    z-index:20;
+    background:var(--bg-dark);
+    color:#fff;
+    border:none;
+    border-radius:999px;
+    padding:12px 18px;
+    font-family:var(--mono);
+    font-size:0.82rem;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
+  }
+  .ticket-toggle .badge{
+    background:var(--accent);
+    color:#fff;
+    border-radius:999px;
+    padding:1px 8px;
+    font-size:0.72rem;
+  }
+  .ticket{
+    position:fixed;
+    right:20px;
+    bottom:82px;
+    width:320px;
+    max-width:calc(100vw - 40px);
+    max-height:60vh;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:0 16px 40px rgba(0,0,0,.18);
+    z-index:20;
+    display:none;
+    flex-direction:column;
+    overflow:hidden;
+    font-family:var(--mono);
+  }
+  .ticket.open{ display:flex; }
+  .ticket-head{
+    padding:14px 16px 10px;
+    border-bottom:1px dashed var(--line);
+  }
+  .ticket-head .lbl{
+    font-size:0.68rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-family:var(--body);
+    font-weight:600;
+  }
+  .ticket-head .title{
+    font-family:var(--disp);
+    font-size:1rem;
+    color:var(--ink);
+    margin-top:2px;
+  }
+  .ticket-body{
+    padding:8px 16px;
+    overflow-y:auto;
+    flex:1;
+  }
+  .ticket-row{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    padding:7px 0;
+    border-bottom:1px dotted #ececea;
+    font-size:0.78rem;
+  }
+  .ticket-row .rname{
+    color:var(--ink);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .ticket-row .rmeta{ color:var(--muted); font-size:0.72rem; }
+  .ticket-row .rkcal{ color:var(--accent-dark); font-weight:600; white-space:nowrap; }
+  .rm{
+    border:none;background:none;color:#b7bcb8;cursor:pointer;font-size:0.85rem;
+    padding:0 0 0 8px;
+  }
+  .rm:hover{ color:var(--protein); }
+  .ticket-empty{
+    color:var(--muted);
+    font-size:0.78rem;
+    padding:18px 0;
+    text-align:center;
+    font-family:var(--body);
+  }
+  .ticket-foot{
+    border-top:1px dashed var(--line);
+    padding:12px 16px 14px;
+    background:#fafaf9;
+  }
+  .tf-row{
+    display:flex; justify-content:space-between;
+    font-size:0.78rem;
+    padding:2px 0;
+    color:var(--muted);
+  }
+  .tf-row.total{
+    font-size:0.98rem;
+    color:var(--ink);
+    font-weight:600;
+    padding-top:6px;
+  }
+  .tf-row.total .val{ color:var(--accent-dark); }
+  .clear-btn{
+    margin-top:10px;
+    width:100%;
+    background:none;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:7px;
+    font-family:var(--body);
+    font-size:0.78rem;
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .clear-btn:hover{ border-color:var(--protein); color:var(--protein); }
+
+  footer{
+    max-width:980px;
+    margin:0 auto;
+    padding:26px 24px 60px;
+    color:var(--muted);
+    font-size:0.8rem;
+    border-top:1px solid var(--line);
+  }
+  footer a{ color:var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <img class="avatar" src="foto.JPG" alt="Alberto Biasi" onerror="this.style.display='none'">
+    <div class="hero-text">
+      <h1>Database Alimenti</h1>
+      <p id="heroCount">Caricamento… · valori nutrizionali per 100&nbsp;g · ricerca e calcolo pasto</p>
+      <a class="backlink" href="index.html">← Torna alla home</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <p class="intro">
+    La creazione di questo strumento online nasce dalla mia necessità di avere a portata di mano
+    su cellulare anche offline la possibilità di accedere ai dati delle calorie degli alimenti
+    che in precedenza conservavo all'interno di un file excel, sul quale il presente sito è basato.
+  </p>
+  <p class="intro" style="margin-top:-16px; font-size:0.85rem;">
+    I dati arrivano dal file <code>alimenti.xlsx</code>: aggiornalo e la pagina si aggiorna da sola.
+  </p>
+
+  <div id="statusBanner" style="display:none; padding:12px 16px; border-radius:10px; font-size:0.85rem; margin-bottom:18px;"></div>
+
+  <section class="table-section">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search" type="text" placeholder="Cerca un alimento… es. pollo, mela, parmigiano" autocomplete="off">
+      </div>
+      <select id="catFilter">
+        <option value="">Tutte le categorie</option>
+      </select>
+    </div>
+    <div class="count" id="count"></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cibo</th>
+            <th>Note</th>
+            <th>Energia<br>[kcal]</th>
+            <th>Categoria</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section class="method">
+    <h2>Come cercare un alimento</h2>
+    <p class="sub">Il database è integrato direttamente nella pagina: nessun caricamento, nessun account, funziona anche offline dopo il primo accesso.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="n">01</div>
+        <h3>Digita nella barra di ricerca</h3>
+        <p>La tabella si filtra a ogni carattere digitato, cercando nel nome dell'alimento. Es. "riso" mostra tutte le varianti (bianco, integrale…).</p>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <h3>Filtra per categoria</h3>
+        <p>Usa il menu a tendina per restringere la ricerca a una sola categoria (es. solo "Pesce e frutti di mare").</p>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <h3>Aggiungi al pasto</h3>
+        <p>Imposta i grammi e premi "+" sulla riga: il pannello in basso a destra somma automaticamente calorie e macronutrienti.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<button class="ticket-toggle" id="ticketToggle">
+  🧾 Il tuo pasto <span class="badge" id="ticketBadge">0</span>
+</button>
+
+<div class="ticket" id="ticket">
+  <div class="ticket-head">
+    <div class="lbl">Riepilogo pasto</div>
+    <div class="title">Composizione live</div>
+  </div>
+  <div class="ticket-body" id="ticketBody">
+    <div class="ticket-empty">Nessun alimento aggiunto.<br>Cerca un cibo e premi "+".</div>
+  </div>
+  <div class="ticket-foot">
+    <div class="tf-row"><span>Grassi</span><span id="tGrassi">0.0 g</span></div>
+    <div class="tf-row"><span>Carboidrati</span><span id="tCarb">0.0 g</span></div>
+    <div class="tf-row"><span>Proteine</span><span id="tProt">0.0 g</span></div>
+    <div class="tf-row total"><span>Totale energia</span><span class="val" id="tKcal">0 kcal</span></div>
+    <button class="clear-btn" id="clearBtn">Svuota il pasto</button>
+  </div>
+</div>
+
+<footer>
+  Parte del portfolio di <a href="index.html">Alberto Biasi</a> — valori nutrizionali medi indicativi
+  (Tabelle CREA/ex-INRAN, USDA FoodData Central). Verifica sempre l'etichetta per prodotti confezionati specifici.
+</footer>
+
+<script>
+let FOODS = [];
+
+const GROUP = {
+  'Cereali e derivati':'grain', 'Legumi':'grain',
+  'Verdura e ortaggi':'veg', 'Frutta':'veg', 'Frutta secca e semi':'veg',
+  'Carne':'protein', 'Salumi':'protein', 'Pesce e frutti di mare':'protein', 'Uova':'protein',
+  'Latte, yogurt e formaggi':'dairy', 'Grassi e oli':'dairy',
+  'Dolci e snack':'treat', 'Bevande':'treat',
+  'Condimenti e salse':'other', 'Piatti pronti e fast food':'other'
+};
+const GROUP_LABEL = {
+  grain:'Cereali e legumi', veg:'Verdura e frutta', protein:'Carne, pesce e uova',
+  dairy:'Latticini e grassi', treat:'Dolci e bevande', other:'Condimenti e pronti'
+};
+
+const tbody = document.getElementById('tbody');
+const searchInput = document.getElementById('search');
+const catFilter = document.getElementById('catFilter');
+const countEl = document.getElementById('count');
+const legendEl = document.getElementById('legend');
+const statusBanner = document.getElementById('statusBanner');
+
+function showBanner(msg, kind){
+  statusBanner.style.display = 'block';
+  statusBanner.textContent = msg;
+  statusBanner.style.background = kind === 'error' ? '#fbeceb' : '#eef6f0';
+  statusBanner.style.color = kind === 'error' ? '#8a3a33' : '#1f6b46';
+  statusBanner.style.border = '1px solid ' + (kind === 'error' ? '#f0c9c6' : '#c9e6d4');
+}
+
+function hideBanner(){ statusBanner.style.display = 'none'; }
+
+// converte celle vuote/undefined -> 0, altrimenti numero
+function parseNum(v){
+  if(v === undefined || v === null || v === '') return 0;
+  const n = typeof v === 'number' ? v : parseFloat(String(v).replace(',', '.'));
+  return isNaN(n) ? 0 : n;
+}
+
+function loadFoods(){
+  showBanner('Caricamento di alimenti.xlsx…', 'ok');
+  // cache-buster: forza il browser a scaricare sempre l'ultima versione del file,
+  // altrimenti riusa una copia in cache anche dopo che hai aggiornato alimenti.xlsx su GitHub
+  fetch('alimenti.xlsx?v=' + Date.now(), { cache: 'no-store' })
+    .then(res => {
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      return res.arrayBuffer();
+    })
+    .then(buf => {
+      const wb = XLSX.read(buf, { type: 'array' });
+      const sheet = wb.Sheets['Alimenti'] || wb.Sheets[wb.SheetNames[0]];
+      // defval:'' evita che le celle vuote (Prezzo/Data/Note) rompano il parsing
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+      FOODS = rows
+        .filter(r => r['Cibo'] && String(r['Cibo']).trim() !== '' && String(r['Categoria'] || '').trim() !== '')
+        .map(r => ({
+          n: String(r['Cibo']).trim(),
+          c: String(r['Categoria'] || 'Altro').trim(),
+          no: String(r['Note'] || '').trim(),
+          k: parseNum(r['Energia[kcal]']),
+          g: parseNum(r['Grassi [g]']),
+          s: parseNum(r['Saturi [g]']),
+          cb: parseNum(r['Carboidrati [g]']),
+          z: parseNum(r['Zuccheri [g]']),
+          f: parseNum(r['Fibre [g]']),
+          p: parseNum(r['Proteine [g]']),
+          sa: parseNum(r['Sale [g]'])
+        }));
+
+      if(FOODS.length === 0){
+        showBanner('Il file alimenti.xlsx non contiene righe valide nel foglio "Alimenti".', 'error');
+        return;
+      }
+      hideBanner();
+      initUI();
+    })
+    .catch(err => {
+      showBanner('Impossibile caricare alimenti.xlsx (' + err.message + '). Se hai aperto il file direttamente dal computer, il browser blocca il caricamento locale: avvia un piccolo server (es. "python3 -m http.server" nella cartella) oppure visita la pagina pubblicata su GitHub Pages.', 'error');
+    });
+}
+
+function initUI(){
+  // conteggio reale delle righe caricate dal file excel, in alto nell'header
+  document.getElementById('heroCount').textContent =
+    FOODS.length + ' alimenti · valori nutrizionali per 100 g · ricerca e calcolo pasto';
+
+  // build category filter options
+  catFilter.innerHTML = '<option value="">Tutte le categorie</option>';
+  [...new Set(FOODS.map(f => f.c))].sort().forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    catFilter.appendChild(opt);
+  });
+
+  // build legend
+  legendEl.innerHTML = '';
+  Object.keys(GROUP_LABEL).forEach(g => {
+    const s = document.createElement('span');
+    s.innerHTML = `<span class="dot" style="background:var(--${g})"></span>${GROUP_LABEL[g]}`;
+    legendEl.appendChild(s);
+  });
+
+  render();
+}
+
+function fmt(n){ return (Math.round(n*10)/10).toString().replace('.', ','); }
+
+function render(){
+  const q = searchInput.value.trim().toLowerCase();
+  const cat = catFilter.value;
+  const filtered = FOODS.filter(f => {
+    const matchQ = !q || f.n.toLowerCase().includes(q);
+    const matchC = !cat || f.c === cat;
+    return matchQ && matchC;
+  });
+
+  countEl.textContent = filtered.length + ' alimenti su ' + FOODS.length;
+
+  if(filtered.length === 0){
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Nessun alimento trovato. Prova un altro termine di ricerca.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((f, i) => {
+    const g = GROUP[f.c] || 'other';
+    const idx = FOODS.indexOf(f);
+    return `<tr>
+      <td>${f.n}</td>
+      <td class="note-cell">${f.no || ''}</td>
+      <td>${fmt(f.k)}</td>
+      <td><span class="tag"><span class="dot" style="background:var(--${g})"></span>${f.c}</span></td>
+      <td>
+        <input class="qty-input" type="number" min="1" value="100" id="qty-${idx}">
+        <button class="addbtn" onclick="addToMeal(${idx})">+</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+searchInput.addEventListener('input', render);
+catFilter.addEventListener('change', render);
+loadFoods();
+
+// ---------------- MEAL TICKET ----------------
+let meal = []; // {idx, qty}
+
+const ticket = document.getElementById('ticket');
+const ticketToggle = document.getElementById('ticketToggle');
+const ticketBody = document.getElementById('ticketBody');
+const ticketBadge = document.getElementById('ticketBadge');
+
+ticketToggle.addEventListener('click', () => {
+  ticket.classList.toggle('open');
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  meal = [];
+  renderMeal();
+});
+
+function addToMeal(idx){
+  const qtyInput = document.getElementById('qty-' + idx);
+  const qty = Math.max(1, parseFloat(qtyInput.value) || 100);
+  meal.push({ idx, qty });
+  ticket.classList.add('open');
+  renderMeal();
+}
+
+function removeFromMeal(i){
+  meal.splice(i, 1);
+  renderMeal();
+}
+
+function renderMeal(){
+  ticketBadge.textContent = meal.length;
+  if(meal.length === 0){
+    ticketBody.innerHTML = '<div class="ticket-empty">Nessun alimento aggiunto.<br>Cerca un cibo e premi "+".</div>';
+  } else {
+    ticketBody.innerHTML = meal.map((m, i) => {
+      const f = FOODS[m.idx];
+      const factor = m.qty / 100;
+      return `<div class="ticket-row">
+        <div style="min-width:0; flex:1;">
+          <div class="rname">${f.n}</div>
+          <div class="rmeta">${m.qty} g</div>
+        </div>
+        <div class="rkcal">${fmt(f.k*factor)} kcal</div>
+        <button class="rm" onclick="removeFromMeal(${i})">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  let kcal=0, grassi=0, carb=0, prot=0;
+  meal.forEach(m => {
+    const f = FOODS[m.idx];
+    const factor = m.qty / 100;
+    kcal += f.k*factor; grassi += f.g*factor; carb += f.cb*factor; prot += f.p*factor;
+  });
+  document.getElementById('tKcal').textContent = Math.round(kcal) + ' kcal';
+  document.getElementById('tGrassi').textContent = fmt(grassi) + ' g';
+  document.getElementById('tCarb').textContent = fmt(carb) + ' g';
+  document.getElementById('tProt').textContent = fmt(prot) + ' g';
+}
+</script>
+
+</body>
+</html>
