@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ricettario — Alberto Biasi</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg-dark:#12181f;
+    --bg-dark-2:#1b2229;
+    --bg-light:#f4f5f3;
+    --card:#ffffff;
+    --ink:#14181d;
+    --muted:#5b6470;
+    --line:#e2e5e2;
+    --accent:#1f9d6b;
+    --accent-dark:#157a54;
+    --amber:#c8862c;
+    --protein:#bd4a3f;
+    --radius:10px;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --disp: 'Space Grotesk', ui-sans-serif, sans-serif;
+    --body: 'Inter', ui-sans-serif, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg-light);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-dark);}
+  h1,h2,h3{ font-family:var(--disp); letter-spacing:-0.01em; }
+
+  /* ---------- GATE ---------- */
+  #gate{
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(900px 420px at 12% -10%, #223027 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-dark-2) 100%);
+    padding:24px;
+  }
+  .gate-card{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;
+    padding:36px 32px;
+    max-width:340px;
+    width:100%;
+    text-align:center;
+  }
+  .gate-card .lock{ font-size:2rem; margin-bottom:10px; }
+  .gate-card h1{ color:#eef1ee; font-size:1.3rem; margin:0 0 6px; }
+  .gate-card p{ color:#9aa39c; font-size:0.85rem; margin:0 0 22px; }
+  #pw{
+    width:100%;
+    padding:11px 14px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.06);
+    color:#eef1ee;
+    font-family:var(--body);
+    font-size:0.95rem;
+    outline:none;
+    text-align:center;
+    letter-spacing:.05em;
+  }
+  #pw:focus{ border-color:var(--accent); }
+  #unlockBtn{
+    width:100%;
+    margin-top:12px;
+    padding:11px;
+    border:none;
+    border-radius:8px;
+    background:var(--accent);
+    color:#fff;
+    font-weight:600;
+    font-size:0.92rem;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  #unlockBtn:hover{ background:var(--accent-dark); }
+  #gateError{
+    color:#f0a39c;
+    font-size:0.8rem;
+    margin-top:12px;
+    min-height:1em;
+  }
+  .backlink{
+    display:inline-block;
+    margin-top:22px;
+    font-size:0.8rem;
+    color:#9aa39c;
+    text-decoration:none;
+  }
+  .backlink:hover{ color:#fff; }
+
+  /* ---------- CONTENT (dopo sblocco) ---------- */
+  #content{ display:none; }
+  header.hero{
+    background:
+      radial-gradient(900px 420px at 12% -10%, #223027 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-dark-2) 100%);
+    color:#eef1ee;
+    padding:40px 24px 36px;
+  }
+  .hero-inner{ max-width:980px; margin:0 auto; }
+  .hero-inner h1{ font-size:clamp(1.5rem,3vw,2rem); margin:0 0 4px; }
+  .hero-inner p{ color:#aab3ac; margin:0; font-size:0.92rem; }
+  .hero-top{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+  .hero-links{ display:flex; gap:10px; }
+  .pill-link{
+    font-size:0.8rem; color:#cfd6d0; text-decoration:none;
+    border:1px solid rgba(255,255,255,.18);
+    padding:6px 12px; border-radius:999px;
+  }
+  .pill-link:hover{ background:rgba(255,255,255,.08); color:#fff; }
+
+  main{ max-width:980px; margin:0 auto; padding:30px 24px 90px; }
+
+  .toolbar{
+    display:flex; gap:10px; flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .search-wrap{ position:relative; flex:1 1 240px; }
+  .search-wrap svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px;height:16px; color:var(--muted); }
+  #search{
+    width:100%; padding:11px 14px 11px 36px;
+    border-radius:var(--radius); border:1px solid var(--line);
+    background:var(--card); font-size:0.95rem; outline:none;
+  }
+  #search:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(31,157,107,.12); }
+  select{
+    padding:11px 14px; border-radius:var(--radius); border:1px solid var(--line);
+    background:var(--card); font-size:0.9rem; outline:none;
+  }
+  .count{ font-family:var(--mono); font-size:0.78rem; color:var(--muted); padding:10px 2px 18px; }
+
+  .recipe-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+    gap:16px;
+  }
+  .recipe-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  .recipe-card:hover{ border-color:var(--accent); }
+  .recipe-card h3{ font-size:1.02rem; margin:0 0 8px; }
+  .rc-meta{
+    display:flex; gap:10px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:0.72rem; color:var(--muted);
+    margin-bottom:8px;
+  }
+  .rc-tag{
+    display:inline-flex; align-items:center; gap:5px;
+    background:#f1f3f1; padding:3px 9px; border-radius:999px;
+  }
+  .rc-note{ font-size:0.82rem; color:var(--muted); margin:0; }
+
+  /* modale dettaglio ricetta */
+  #overlay{
+    display:none;
+    position:fixed; inset:0; z-index:40;
+    background:rgba(15,20,16,.55);
+    align-items:center; justify-content:center;
+    padding:20px;
+  }
+  #overlay.open{ display:flex; }
+  .modal{
+    background:var(--card);
+    border-radius:14px;
+    max-width:640px; width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+    padding:30px 30px 26px;
+    position:relative;
+  }
+  .modal .closeBtn{
+    position:absolute; top:16px; right:16px;
+    border:none; background:#f1f3f1; color:var(--muted);
+    width:30px; height:30px; border-radius:50%;
+    cursor:pointer; font-size:1rem;
+  }
+  .modal .closeBtn:hover{ background:#e6e9e6; color:var(--ink); }
+  .modal h2{ font-size:1.35rem; margin:0 0 6px; padding-right:40px; }
+  .modal .rc-meta{ margin-bottom:18px; }
+  .modal h4{ font-family:var(--disp); font-size:0.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-dark); margin:22px 0 10px; }
+  .modal ul, .modal ol{ margin:0; padding-left:20px; }
+  .modal li{ margin-bottom:6px; font-size:0.92rem; }
+  .modal .note-block{
+    margin-top:20px; padding:12px 14px;
+    background:#fafaf9; border-radius:8px;
+    font-size:0.85rem; color:var(--muted);
+    border:1px dashed var(--line);
+  }
+
+  .status-banner{
+    padding:12px 16px; border-radius:10px; font-size:0.85rem; margin-bottom:18px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= GATE ================= -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="lock">🔒</div>
+    <h1>Ricettario</h1>
+    <p>Area riservata — inserisci la password per accedere.</p>
+    <input type="password" id="pw" placeholder="Password" autocomplete="off">
+    <button id="unlockBtn">Accedi</button>
+    <div id="gateError"></div>
+    <a class="backlink" href="index.html">← Torna alla home</a>
+  </div>
+</div>
+
+<!-- ================= CONTENT ================= -->
+<div id="content">
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-top">
+        <div>
+          <h1>🍲 Ricettario</h1>
+          <p>Le mie ricette, ricercabili per nome o categoria</p>
+        </div>
+        <div class="hero-links">
+          <a class="pill-link" href="index.html">← Home</a>
+          <a class="pill-link" href="#" id="lockBtn">🔒 Blocca</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="statusBanner" class="status-banner" style="display:none;"></div>
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search" type="text" placeholder="Cerca una ricetta…" autocomplete="off">
+      </div>
+      <select id="catFilter"><option value="">Tutte le categorie</option></select>
+    </div>
+    <div class="count" id="count"></div>
+
+    <div class="recipe-grid" id="grid"></div>
+  </main>
+</div>
+
+<!-- ================= MODALE DETTAGLIO ================= -->
+<div id="overlay">
+  <div class="modal">
+    <button class="closeBtn" id="closeModal">✕</button>
+    <h2 id="mTitle"></h2>
+    <div class="rc-meta" id="mMeta"></div>
+    <h4>Ingredienti</h4>
+    <ul id="mIngredienti"></ul>
+    <h4>Procedimento</h4>
+    <ol id="mProcedimento"></ol>
+    <div class="note-block" id="mNoteBlock" style="display:none;">
+      <strong>Note:</strong> <span id="mNote"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- CONFIGURAZIONE PASSWORD ----------
+// La password NON è salvata in chiaro: viene confrontato l'hash SHA-256.
+// Per cambiarla: apri la console del browser su questa pagina e digita
+//   crypto.subtle.digest('SHA-256', new TextEncoder().encode('NUOVAPASSWORD')).then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+// poi sostituisci il valore qui sotto con l'hash stampato in console.
+const PW_HASH = 'b3cb1397c5fe2049d60f315b76f4097fc439a334632aa20b9a7e8fa7c8bb9261'; // password di default: ricette2026
+const UNLOCK_KEY = 'ricettario_unlocked';
+
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+const gate = document.getElementById('gate');
+const content = document.getElementById('content');
+const pwInput = document.getElementById('pw');
+const gateError = document.getElementById('gateError');
+
+async function tryUnlock(){
+  const val = pwInput.value;
+  const hash = await sha256(val);
+  if(hash === PW_HASH){
+    localStorage.setItem(UNLOCK_KEY, '1');
+    showContent();
+  } else {
+    gateError.textContent = 'Password errata, riprova.';
+    pwInput.value = '';
+    pwInput.focus();
+  }
+}
+
+function showContent(){
+  gate.style.display = 'none';
+  content.style.display = 'block';
+  if(FOODS_LOADED === false) loadRecipes();
+}
+
+document.getElementById('unlockBtn').addEventListener('click', tryUnlock);
+pwInput.addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+
+document.getElementById('lockBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  localStorage.removeItem(UNLOCK_KEY);
+  content.style.display = 'none';
+  gate.style.display = 'flex';
+  pwInput.value = '';
+  pwInput.focus();
+});
+
+if(localStorage.getItem(UNLOCK_KEY) === '1'){
+  showContent();
+}
+
+// ---------- CARICAMENTO RICETTE DA ricette.xlsx ----------
+let RECIPES = [];
+let FOODS_LOADED = false;
+const grid = document.getElementById('grid');
+const searchInput = document.getElementById('search');
+const catFilter = document.getElementById('catFilter');
+const countEl = document.getElementById('count');
+const statusBanner = document.getElementById('statusBanner');
+
+function showBanner(msg, kind){
+  statusBanner.style.display = 'block';
+  statusBanner.textContent = msg;
+  statusBanner.style.background = kind === 'error' ? '#fbeceb' : '#eef6f0';
+  statusBanner.style.color = kind === 'error' ? '#8a3a33' : '#1f6b46';
+  statusBanner.style.border = '1px solid ' + (kind === 'error' ? '#f0c9c6' : '#c9e6d4');
+}
+function hideBanner(){ statusBanner.style.display = 'none'; }
+
+function splitLines(v){
+  if(!v) return [];
+  const s = String(v);
+  const parts = s.includes('\n') ? s.split('\n') : s.split(';');
+  return parts.map(x => x.trim()).filter(Boolean);
+}
+
+function loadRecipes(){
+  FOODS_LOADED = true;
+  showBanner('Caricamento di ricette.xlsx…', 'ok');
+  fetch('ricette.xlsx?v=' + Date.now(), { cache: 'no-store' })
+    .then(res => {
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      return res.arrayBuffer();
+    })
+    .then(buf => {
+      const wb = XLSX.read(buf, { type: 'array' });
+      const sheet = wb.Sheets['Ricette'] || wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      RECIPES = rows
+        .filter(r => r['Nome ricetta'] && String(r['Nome ricetta']).trim() !== '' && String(r['Categoria']||'').trim() !== '')
+        .map(r => ({
+          n: String(r['Nome ricetta']).trim(),
+          c: String(r['Categoria'] || 'Altro').trim(),
+          t: r['Tempo [min]'] || '',
+          porz: r['Porzioni'] || '',
+          ingr: splitLines(r['Ingredienti']),
+          proc: splitLines(r['Procedimento']),
+          note: String(r['Note'] || '').trim()
+        }));
+      if(RECIPES.length === 0){
+        showBanner('Il file ricette.xlsx non contiene righe valide nel foglio "Ricette".', 'error');
+        return;
+      }
+      hideBanner();
+      initUI();
+    })
+    .catch(err => {
+      showBanner('Impossibile caricare ricette.xlsx (' + err.message + '). Se hai aperto il file in locale, avvia un server (es. "python3 -m http.server") oppure visita la pagina pubblicata su GitHub Pages.', 'error');
+    });
+}
+
+function initUI(){
+  catFilter.innerHTML = '<option value="">Tutte le categorie</option>';
+  [...new Set(RECIPES.map(r => r.c))].sort().forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    catFilter.appendChild(opt);
+  });
+  render();
+}
+
+function render(){
+  const q = searchInput.value.trim().toLowerCase();
+  const cat = catFilter.value;
+  const filtered = RECIPES.filter(r => {
+    const matchQ = !q || r.n.toLowerCase().includes(q);
+    const matchC = !cat || r.c === cat;
+    return matchQ && matchC;
+  });
+  countEl.textContent = filtered.length + ' ricette su ' + RECIPES.length;
+
+  if(filtered.length === 0){
+    grid.innerHTML = '<p style="color:var(--muted); font-size:0.9rem;">Nessuna ricetta trovata.</p>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(r => {
+    const idx = RECIPES.indexOf(r);
+    const meta = [];
+    if(r.t) meta.push(`<span class="rc-tag">⏱ ${r.t} min</span>`);
+    if(r.porz) meta.push(`<span class="rc-tag">🍽 ${r.porz} porz.</span>`);
+    meta.push(`<span class="rc-tag">${r.c}</span>`);
+    return `<article class="recipe-card" onclick="openRecipe(${idx})">
+      <h3>${r.n}</h3>
+      <div class="rc-meta">${meta.join('')}</div>
+    </article>`;
+  }).join('');
+}
+
+searchInput.addEventListener('input', render);
+catFilter.addEventListener('change', render);
+
+// ---------- MODALE ----------
+const overlay = document.getElementById('overlay');
+function openRecipe(idx){
+  const r = RECIPES[idx];
+  document.getElementById('mTitle').textContent = r.n;
+  const meta = [];
+  if(r.t) meta.push(`<span class="rc-tag">⏱ ${r.t} min</span>`);
+  if(r.porz) meta.push(`<span class="rc-tag">🍽 ${r.porz} porzioni</span>`);
+  meta.push(`<span class="rc-tag">${r.c}</span>`);
+  document.getElementById('mMeta').innerHTML = meta.join('');
+  document.getElementById('mIngredienti').innerHTML = r.ingr.map(i => `<li>${i}</li>`).join('') || '<li>—</li>';
+  document.getElementById('mProcedimento').innerHTML = r.proc.map(p => `<li>${p}</li>`).join('') || '<li>—</li>';
+  const noteBlock = document.getElementById('mNoteBlock');
+  if(r.note){
+    noteBlock.style.display = 'block';
+    document.getElementById('mNote').textContent = r.note;
+  } else {
+    noteBlock.style.display = 'none';
+  }
+  overlay.classList.add('open');
+}
+document.getElementById('closeModal').addEventListener('click', () => overlay.classList.remove('open'));
+overlay.addEventListener('click', (e) => { if(e.target === overlay) overlay.classList.remove('open'); });
+</script>
+
+</body>
+</html>
