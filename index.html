@@ -582,7 +582,9 @@ function parseNum(v){
 
 function loadFoods(){
   showBanner('Caricamento di alimenti.xlsx…', 'ok');
-  fetch('alimenti.xlsx')
+  // cache-buster: forza il browser a scaricare sempre l'ultima versione del file,
+  // altrimenti riusa una copia in cache anche dopo che hai aggiornato alimenti.xlsx su GitHub
+  fetch('alimenti.xlsx?v=' + Date.now(), { cache: 'no-store' })
     .then(res => {
       if(!res.ok) throw new Error('HTTP ' + res.status);
       return res.arrayBuffer();
