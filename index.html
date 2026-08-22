@@ -166,7 +166,7 @@
     width:100%;
     border-collapse:collapse;
     font-size:0.86rem;
-    min-width:820px;
+    min-width:520px;
   }
   thead th{
     position:sticky; top:0;
@@ -182,7 +182,7 @@
     border-bottom:1px solid var(--line);
     white-space:nowrap;
   }
-  thead th:first-child, thead th:nth-child(2){ text-align:left; }
+  thead th:first-child, thead th:nth-child(2), thead th:nth-child(3){ text-align:left; }
   tbody td{
     padding:9px 12px;
     border-bottom:1px solid #eef0ee;
@@ -199,6 +199,14 @@
     font-weight:500;
   }
   tbody td:nth-child(2){ text-align:left; }
+  .note-cell{
+    text-align:left;
+    font-family:var(--body);
+    color:var(--muted);
+    white-space:normal;
+    max-width:220px;
+    font-size:0.82rem;
+  }
   tbody tr:hover{ background:#f7faf8; }
   .tag{
     display:inline-flex;
@@ -437,7 +445,7 @@
     <img class="avatar" src="foto.JPG" alt="Alberto Biasi" onerror="this.style.display='none'">
     <div class="hero-text">
       <h1>Database Alimenti</h1>
-      <p>Valori nutrizionali per 100&nbsp;g · ricerca e calcolo</p>
+      <p>269 alimenti comuni · valori nutrizionali per 100&nbsp;g · ricerca e calcolo pasto</p>
       <a class="backlink" href="index.html">← Torna alla home</a>
     </div>
   </div>
@@ -448,6 +456,7 @@
     Piccolo strumento nato insieme al foglio Excel per il calcolo delle calorie giornaliere:
     <strong>cerca un alimento</strong>, controlla i suoi valori per 100&nbsp;g, e se vuoi
     <strong>aggiungilo al tuo pasto</strong> per vedere il totale calorico in tempo reale (in basso a destra).
+    I dati arrivano dal file <code>alimenti.xlsx</code>: aggiornalo e la pagina si aggiorna da sola.
   </p>
 
   <div id="statusBanner" style="display:none; padding:12px 16px; border-radius:10px; font-size:0.85rem; margin-bottom:18px;"></div>
@@ -470,14 +479,8 @@
           <tr>
             <th>Cibo</th>
             <th>Categoria</th>
+            <th>Note</th>
             <th>Energia<br>[kcal]</th>
-            <th>Grassi<br>[g]</th>
-            <th>Saturi<br>[g]</th>
-            <th>Carb.<br>[g]</th>
-            <th>Zuccheri<br>[g]</th>
-            <th>Fibre<br>[g]</th>
-            <th>Proteine<br>[g]</th>
-            <th>Sale<br>[g]</th>
             <th></th>
           </tr>
         </thead>
@@ -595,6 +598,7 @@ function loadFoods(){
         .map(r => ({
           n: String(r['Cibo']).trim(),
           c: String(r['Categoria'] || 'Altro').trim(),
+          no: String(r['Note'] || '').trim(),
           k: parseNum(r['Energia[kcal]']),
           g: parseNum(r['Grassi [g]']),
           s: parseNum(r['Saturi [g]']),
@@ -651,7 +655,7 @@ function render(){
   countEl.textContent = filtered.length + ' alimenti su ' + FOODS.length;
 
   if(filtered.length === 0){
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="11">Nessun alimento trovato. Prova un altro termine di ricerca.</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Nessun alimento trovato. Prova un altro termine di ricerca.</td></tr>';
     return;
   }
 
@@ -661,14 +665,8 @@ function render(){
     return `<tr>
       <td>${f.n}</td>
       <td><span class="tag"><span class="dot" style="background:var(--${g})"></span>${f.c}</span></td>
+      <td class="note-cell">${f.no || ''}</td>
       <td>${fmt(f.k)}</td>
-      <td>${fmt(f.g)}</td>
-      <td>${fmt(f.s)}</td>
-      <td>${fmt(f.cb)}</td>
-      <td>${fmt(f.z)}</td>
-      <td>${fmt(f.f)}</td>
-      <td>${fmt(f.p)}</td>
-      <td>${fmt(f.sa)}</td>
       <td>
         <input class="qty-input" type="number" min="1" value="100" id="qty-${idx}">
         <button class="addbtn" onclick="addToMeal(${idx})">+</button>
