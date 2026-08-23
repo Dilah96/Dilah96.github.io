@@ -1,0 +1,54 @@
+/* =====================================================================
+   SITE TOKENS — variabili di design, reset, tipografia di base
+   Includi questo file per PRIMO in ogni pagina del sito, prima di
+   site-components.css e di eventuali stili specifici della pagina.
+   ===================================================================== */
+
+:root{
+  /* colori */
+  --bg-dark:#12181f;
+  --bg-dark-2:#1b2229;
+  --bg-light:#f4f5f3;
+  --card:#ffffff;
+  --ink:#14181d;
+  --muted:#5b6470;
+  --line:#e2e5e2;
+  --accent:#1f9d6b;
+  --accent-dark:#157a54;
+  --amber:#c8862c;
+  --protein:#bd4a3f;
+
+  /* categorie colorate (usate da alimenti/ricette, riusabili per altre pagine a card) */
+  --grain:#b8813a;
+  --veg:#1f9d6b;
+  --dairy:#c99a2a;
+  --treat:#7d5aad;
+  --other:#697079;
+
+  /* layout */
+  --radius:10px;
+  --max-width:1040px;
+
+  /* font */
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --disp: 'Space Grotesk', ui-sans-serif, sans-serif;
+  --body: 'Inter', ui-sans-serif, sans-serif;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+
+body{
+  margin:0;
+  background:var(--bg-light);
+  color:var(--ink);
+  font-family:var(--body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+a{ color:var(--accent-dark); }
+h1, h2, h3{ font-family:var(--disp); letter-spacing:-0.01em; margin:0; }
+
+/* utility di layout riusabile su ogni pagina */
+.page-main{ max-width:var(--max-width); margin:0 auto; padding:0 24px; }
