@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aggiungi alimento — Alberto Biasi</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stylesheets/site-tokens.css">
+<link rel="stylesheet" href="stylesheets/site-components.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- ================= GATE ================= -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="lock">🔒</div>
+    <h1>Aggiungi alimento</h1>
+    <p>Area riservata — inserisci la password per accedere.</p>
+    <input type="password" id="pw" placeholder="Password" autocomplete="off">
+    <button id="unlockBtn">Accedi</button>
+    <div id="gateError"></div>
+    <a class="gate-link" href="alimenti.html">← Torna al database alimenti</a>
+  </div>
+</div>
+
+<!-- ================= CONTENT ================= -->
+<div id="content" style="display:none;">
+  <header class="hero">
+    <div class="hero-inner">
+      <div style="flex:1;">
+        <h1 style="color:#eef1ee; font-size:clamp(1.4rem,3vw,1.9rem); margin:0 0 6px;">➕ Aggiungi un alimento</h1>
+        <p style="color:#aab3ac; margin:0; font-size:0.92rem;">Compila i campi, aggiungi alla lista, poi esporta per incollarli in <code>alimenti.xlsx</code>.</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a class="pill-btn pill-btn--dark" href="alimenti.html">← Database alimenti</a>
+        <a class="pill-btn pill-btn--dark" href="#" id="lockBtn">🔒 Blocca</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main" style="padding-top:30px; padding-bottom:90px;">
+
+    <div id="statusBanner" class="status-banner"></div>
+
+    <section style="border-bottom:none; padding-top:0;">
+      <h2>Nuovo alimento</h2>
+      <p class="sub">
+        Questa pagina <strong>non scrive automaticamente</strong> nel file sul sito (è statico, non ha un server):
+        prepara i dati pronti da incollare tu stesso in <code>alimenti.xlsx</code>, poi carichi il file aggiornato su GitHub.
+      </p>
+
+      <form id="foodForm" novalidate>
+        <div class="form-grid">
+          <div class="field full">
+            <label for="f_nome">Cibo <span class="req">*</span></label>
+            <input type="text" id="f_nome" placeholder="es. Pasta di semola, secca, cruda" required>
+          </div>
+
+          <div class="field">
+            <label for="f_categoria">Categoria <span class="req">*</span></label>
+            <select id="f_categoria" required>
+              <option value="">Caricamento categorie…</option>
+              <option value="__new__">+ Nuova categoria…</option>
+            </select>
+          </div>
+          <div class="field" id="newCatWrap" style="display:none;">
+            <label for="f_categoria_new">Nome nuova categoria</label>
+            <input type="text" id="f_categoria_new" placeholder="es. Bevande vegetali">
+          </div>
+
+          <div class="field">
+            <label for="f_kcal">Energia [kcal] <span class="req">*</span></label>
+            <input type="number" id="f_kcal" step="1" min="0" placeholder="es. 353">
+          </div>
+          <div class="field">
+            <label for="f_grassi">Grassi [g]</label>
+            <input type="number" id="f_grassi" step="0.1" min="0" placeholder="es. 1.5">
+          </div>
+          <div class="field">
+            <label for="f_saturi">di cui Saturi [g]</label>
+            <input type="number" id="f_saturi" step="0.1" min="0" placeholder="es. 0.3">
+          </div>
+          <div class="field">
+            <label for="f_carb">Carboidrati [g]</label>
+            <input type="number" id="f_carb" step="0.1" min="0" placeholder="es. 71">
+          </div>
+          <div class="field">
+            <label for="f_zuccheri">di cui Zuccheri [g]</label>
+            <input type="number" id="f_zuccheri" step="0.1" min="0" placeholder="es. 3">
+          </div>
+          <div class="field">
+            <label for="f_fibre">Fibre [g]</label>
+            <input type="number" id="f_fibre" step="0.1" min="0" placeholder="es. 3">
+          </div>
+          <div class="field">
+            <label for="f_proteine">Proteine [g]</label>
+            <input type="number" id="f_proteine" step="0.1" min="0" placeholder="es. 12.5">
+          </div>
+          <div class="field">
+            <label for="f_sale">Sale [g]</label>
+            <input type="number" id="f_sale" step="0.01" min="0" placeholder="es. 0.02">
+          </div>
+          <div class="field">
+            <label for="f_prezzo">Prezzo [100g]</label>
+            <input type="number" id="f_prezzo" step="0.01" min="0" placeholder="facoltativo">
+          </div>
+          <div class="field">
+            <label for="f_data">Data</label>
+            <input type="date" id="f_data">
+          </div>
+          <div class="field full">
+            <label for="f_note">Note</label>
+            <textarea id="f_note" placeholder="facoltativo — es. marca, bio, senza glutine…"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="pill-btn pill-btn--solid">＋ Aggiungi alla lista</button>
+          <button type="button" class="pill-btn pill-btn--light" id="resetBtn">Svuota campi</button>
+        </div>
+      </form>
+    </section>
+
+    <section>
+      <h2>Alimenti pronti da esportare</h2>
+      <p class="sub" id="queueCount">Nessun alimento in lista.</p>
+
+      <div class="table-wrap" style="max-height:none;">
+        <table class="data-table" id="queueTable">
+          <thead>
+            <tr>
+              <th class="al">Cibo</th>
+              <th class="al">Categoria</th>
+              <th>Kcal</th>
+              <th class="al"></th>
+            </tr>
+          </thead>
+          <tbody id="queueBody">
+            <tr><td colspan="4" class="queue-empty" style="text-align:center;">Aggiungi il primo alimento dal modulo qui sopra.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="form-actions">
+        <button class="pill-btn pill-btn--solid" id="copyBtn">📋 Copia per Excel (consigliato)</button>
+        <button class="pill-btn pill-btn--light" id="downloadBtn">⬇️ Scarica .xlsx separato</button>
+      </div>
+      <p id="copyFeedback" class="field hint" style="margin-top:8px;"></p>
+    </section>
+
+    <section>
+      <h2>Come pubblicarli sul sito</h2>
+      <p class="sub">Tre passaggi, sempre gli stessi ogni volta che aggiungi alimenti.</p>
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-title">1. Copia i dati</div>
+          <p class="card-desc">Premi "Copia per Excel": le righe vengono messe negli appunti già nell'ordine giusto delle colonne (Cibo → Categoria).</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Incolla nel file vero</div>
+          <p class="card-desc">Apri il tuo <code>alimenti.xlsx</code>, vai nella prima riga vuota sotto l'ultimo alimento (sopra le righe di nota in fondo) e incolla con Ctrl+V.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Ricarica su GitHub</div>
+          <p class="card-desc">Salva il file e ricaricalo nel repository al posto del vecchio <code>alimenti.xlsx</code>. Entro un paio di minuti la tabella online si aggiorna da sola.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ---------- PASSWORD ----------
+// Password di default: nuovocibo2026 — cambiala generando un nuovo hash in console:
+//   crypto.subtle.digest('SHA-256', new TextEncoder().encode('NUOVAPASSWORD')).then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+const PW_HASH = '00acd7137ad4d719dd6ca8f73e97e64427a409c8064ca1691b82279268ec0aca';
+const UNLOCK_KEY = 'aggiungi_alimento_unlocked';
+
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+const gate = document.getElementById('gate');
+const content = document.getElementById('content');
+const pwInput = document.getElementById('pw');
+const gateError = document.getElementById('gateError');
+let CATS_LOADED = false;
+
+async function tryUnlock(){
+  const hash = await sha256(pwInput.value);
+  if(hash === PW_HASH){
+    localStorage.setItem(UNLOCK_KEY, '1');
+    showContent();
+  } else {
+    gateError.textContent = 'Password errata, riprova.';
+    pwInput.value = '';
+    pwInput.focus();
+  }
+}
+function showContent(){
+  gate.style.display = 'none';
+  content.style.display = 'block';
+  if(!CATS_LOADED) loadCategories();
+}
+document.getElementById('unlockBtn').addEventListener('click', tryUnlock);
+pwInput.addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+document.getElementById('lockBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  localStorage.removeItem(UNLOCK_KEY);
+  content.style.display = 'none';
+  gate.style.display = 'flex';
+  pwInput.value = '';
+  pwInput.focus();
+});
+if(localStorage.getItem(UNLOCK_KEY) === '1'){ showContent(); }
+
+// ---------- BANNER ----------
+const statusBanner = document.getElementById('statusBanner');
+function showBanner(msg, kind){
+  statusBanner.classList.add('show');
+  statusBanner.classList.toggle('ok', kind !== 'error');
+  statusBanner.classList.toggle('error', kind === 'error');
+  statusBanner.textContent = msg;
+}
+function hideBanner(){ statusBanner.classList.remove('show'); }
+
+// ---------- CARICA CATEGORIE ESISTENTI DA alimenti.xlsx ----------
+const catSelect = document.getElementById('f_categoria');
+const newCatWrap = document.getElementById('newCatWrap');
+const newCatInput = document.getElementById('f_categoria_new');
+
+function loadCategories(){
+  CATS_LOADED = true;
+  showBanner('Caricamento categorie da alimenti.xlsx…', 'ok');
+  fetch('alimenti.xlsx?v=' + Date.now(), { cache: 'no-store' })
+    .then(res => { if(!res.ok) throw new Error('HTTP ' + res.status); return res.arrayBuffer(); })
+    .then(buf => {
+      const wb = XLSX.read(buf, { type: 'array' });
+      const sheet = wb.Sheets['Alimenti'] || wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      const cats = [...new Set(rows
+        .filter(r => r['Cibo'] && String(r['Categoria']||'').trim() !== '')
+        .map(r => String(r['Categoria']).trim()))].sort();
+
+      catSelect.innerHTML = '<option value="">Seleziona una categoria…</option>' +
+        cats.map(c => `<option value="${c}">${c}</option>`).join('') +
+        '<option value="__new__">+ Nuova categoria…</option>';
+      hideBanner();
+    })
+    .catch(err => {
+      showBanner('Non sono riuscito a caricare le categorie da alimenti.xlsx (' + err.message + '). Puoi comunque scrivere una categoria a mano scegliendo "+ Nuova categoria".', 'error');
+      catSelect.innerHTML = '<option value="">—</option><option value="__new__">+ Nuova categoria…</option>';
+    });
+}
+
+catSelect.addEventListener('change', () => {
+  newCatWrap.style.display = catSelect.value === '__new__' ? 'flex' : 'none';
+});
+
+// ---------- CODA ALIMENTI ----------
+let QUEUE = [];
+const queueBody = document.getElementById('queueBody');
+const queueCount = document.getElementById('queueCount');
+const form = document.getElementById('foodForm');
+
+function num(id){
+  const v = document.getElementById(id).value;
+  return v === '' ? '' : parseFloat(v);
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('f_nome').value.trim();
+  let categoria = catSelect.value;
+  if(categoria === '__new__'){ categoria = newCatInput.value.trim(); }
+  const kcal = num('f_kcal');
+
+  if(!nome){ alert('Inserisci il nome del cibo.'); return; }
+  if(!categoria){ alert('Seleziona o inserisci una categoria.'); return; }
+  if(kcal === ''){ alert('Inserisci almeno le kcal.'); return; }
+
+  QUEUE.push({
+    nome, categoria, kcal,
+    grassi: num('f_grassi'), saturi: num('f_saturi'),
+    carb: num('f_carb'), zuccheri: num('f_zuccheri'),
+    fibre: num('f_fibre'), proteine: num('f_proteine'),
+    sale: num('f_sale'), prezzo: num('f_prezzo'),
+    data: document.getElementById('f_data').value,
+    note: document.getElementById('f_note').value.trim()
+  });
+
+  // se era una categoria nuova, aggiungila anche al menu per i prossimi inserimenti
+  if(![...catSelect.options].some(o => o.value === categoria)){
+    const opt = document.createElement('option');
+    opt.value = categoria; opt.textContent = categoria;
+    catSelect.insertBefore(opt, catSelect.querySelector('option[value="__new__"]'));
+  }
+
+  form.reset();
+  newCatWrap.style.display = 'none';
+  document.getElementById('f_nome').focus();
+  renderQueue();
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  form.reset();
+  newCatWrap.style.display = 'none';
+});
+
+function renderQueue(){
+  queueCount.textContent = QUEUE.length === 0
+    ? 'Nessun alimento in lista.'
+    : QUEUE.length + (QUEUE.length === 1 ? ' alimento pronto da esportare.' : ' alimenti pronti da esportare.');
+
+  if(QUEUE.length === 0){
+    queueBody.innerHTML = '<tr><td colspan="4" class="queue-empty" style="text-align:center;">Aggiungi il primo alimento dal modulo qui sopra.</td></tr>';
+    return;
+  }
+  queueBody.innerHTML = QUEUE.map((f, i) => `
+    <tr>
+      <td class="text-cell">${f.nome}</td>
+      <td class="al">${f.categoria}</td>
+      <td>${f.kcal}</td>
+      <td class="al"><button class="queue-row-remove" onclick="removeQueue(${i})" title="Rimuovi">✕</button></td>
+    </tr>`).join('');
+}
+function removeQueue(i){ QUEUE.splice(i, 1); renderQueue(); }
+
+// ---------- ESPORTAZIONE ----------
+// Ordine colonne = A..M del file alimenti.xlsx originale
+function toRows(){
+  return QUEUE.map(f => [
+    f.nome, f.kcal, f.grassi, f.saturi, f.carb, f.zuccheri,
+    f.fibre, f.proteine, f.sale, f.prezzo, f.data, f.note, f.categoria
+  ]);
+}
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  if(QUEUE.length === 0){ alert('Aggiungi almeno un alimento prima di esportare.'); return; }
+  const tsv = toRows().map(r => r.map(v => v === '' || v === undefined ? '' : v).join('\t')).join('\n');
+  navigator.clipboard.writeText(tsv).then(() => {
+    document.getElementById('copyFeedback').textContent =
+      '✓ Copiato! Vai su alimenti.xlsx, seleziona la prima cella vuota sotto l\'ultimo alimento (colonna Cibo) e incolla con Ctrl+V.';
+  }).catch(() => {
+    document.getElementById('copyFeedback').textContent =
+      'Non sono riuscito a copiare automaticamente: seleziona e copia manualmente il testo dalla console del browser.';
+    console.log(tsv);
+  });
+});
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  if(QUEUE.length === 0){ alert('Aggiungi almeno un alimento prima di esportare.'); return; }
+  const headers = ['Cibo','Energia[kcal]','Grassi [g]','Saturi [g]','Carboidrati [g]','Zuccheri [g]',
+                    'Fibre [g]','Proteine [g]','Sale [g]','Prezzo [100g]','Data','Note','Categoria'];
+  const aoa = [headers, ...toRows()];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Nuovi alimenti');
+  XLSX.writeFile(wb, 'nuovi-alimenti.xlsx');
+});
+</script>
+
+</body>
+</html>
